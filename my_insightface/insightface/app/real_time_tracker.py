@@ -7,6 +7,8 @@ from threading import Event
 from typing import NamedTuple
 
 import numpy as np
+
+from milvus_standalone.milvus_for_realtime import MilvusRealTime
 from .sort_plus import associate_detections_to_trackers, KalmanBoxTracker
 from .common import Face
 from .face_analysis import Milvus2Search
@@ -164,14 +166,21 @@ class Extractor:
         self.rec_model = get_model(root, providers=('CUDAExecutionProvider', 'CPUExecutionProvider'))
         self.rec_model.prepare(ctx_id=0)
 
-    def __call__(self, img2extract: LightImage) -> LightImage:
-        for i in range(img2extract.faces.__len__()):
-            face = Face(bbox=img2extract.faces[i][0],
-                        kps=img2extract.faces[i][1],
-                        det_score=img2extract.faces[i][2])
-            self.rec_model.get(img2extract.nd_arr, face)
-            img2extract.faces[i][3] = face.embedding
-        return img2extract
+    def __call__(self, img2extract: LightImage,
+                 bbox: np.ndarray[4, 2], kps: np.ndarray[5, 2], det_score: float) -> np.ndarray[512]:
+        """
+        get embedding of face from given target bbox and kps, and det_score
+        :param img2extract: target at which image
+        :param bbox: target bbox
+        :param kps: target kps
+        :param det_score: target det_score
+        :return: face embedding
+        """
+        face = Face(bbox=bbox,
+                    kps=kps,
+                    det_score=det_score)
+        self.rec_model.get(img2extract.nd_arr, face)
+        return face.normed_embedding
 
 
 class RawTarget(NamedTuple):
@@ -195,6 +204,7 @@ class Target:
         self.frames_since_reced: int = 0
         self._screen_scale = screen_scale  # [x1, y1, x2, y2]
         self._tracker: KalmanBoxTracker = KalmanBoxTracker(bbox)
+        self.normed_embedding: np.ndarray[512] = np.zeros(512)
 
     def update_pos(self, bbox: np.ndarray, kps: np.ndarray, score: float):
         self.bbox = bbox
@@ -313,6 +323,7 @@ class Identifier:
         self.iou_threshold = iou_threshold
         self._recycled_ids = []
         self._extractor = Extractor()
+        self._milvus = MilvusRealTime()
         self._frame_cnt = 0
 
     def identified_results(self, image2identify: LightImage) -> LightImage:
@@ -329,7 +340,10 @@ class Identifier:
                 target.match_info = match_info
             image2identify.faces.append(
                 [target.bbox, target.kps, target.score, target.colors, target.match_info])
-        self._frame_cnt += 1
+        if self._frame_cnt < 100000:
+            self._frame_cnt += 1
+        else:
+            self._frame_cnt = 0
         return image2identify
 
     def _update(self, image2update: LightImage):
@@ -387,15 +401,16 @@ class Identifier:
             else:
                 heapq.heappush(self._recycled_ids, k)
 
+    def _search(self, image2search: LightImage):
+
+        self._milvus.face_match([tar for tar in self._targets.values()
+                                 if tar.normed_embedding.all()], 0.6)
+        return image2search
+
     def _extract(self, image2extract: LightImage):
         for tar in self._targets.values():
             if tar.rec_satified:
-                self._extractor(image2extract)
-                # simulate the result of matching
-                if self._frame_cnt % 2 == 0:
-                    tar.set_match_info(MatchInfo(face_id=tar.id, name=f'extracted[{tar.id}]', score=1.0))
-                else:
-                    tar.set_match_info(MatchInfo(face_id=tar.id, name=f'extracted[{tar.id}]', score=0.0))
+                tar.normed_embedding = self._extractor(image2extract,tar.bbox,tar.kps,tar.score)
         return image2extract
 
     def _generate_id(self):

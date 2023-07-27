@@ -258,24 +258,6 @@ class Milvus2Search:
                 match_infos = []
         return cur_images
 
-    '''def search_by_cosine(self, cur_image: Image) -> Image:
-        # 用余弦相似度进行匹配
-        normed_ip = lambda Face_a, Face_b: np.dot(Face_a.normed_embedding, Face_b.normed_embedding)
-        for cur_face in cur_image.faces:
-            match_info_params = {'score': 0.0,
-                                 'face_id': -1,
-                                 'name': ''}
-            for face in self.registered_faces:
-                if not isinstance(face.normed_embedding, np.ndarray):
-                    raise TypeError('embedding must be a numpy array')
-                score = normed_ip(cur_face, face)
-                if score > match_info_params['score'] > 0.5:
-                    match_info_params['score'] = score
-                    match_info_params['face_id'] = face.id
-                    match_info_params['name'] = face.name
-            self._set_match_info(cur_face, **match_info_params)
-        return cur_image'''
-
     def face_match(self, cur_images: list[Image], match_thresh: float = 0.6) -> list[Image] | None:
         """
         人脸匹配，返回一cur_face对象，cur_face设置了match_info，作为匹配结果
