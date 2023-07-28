@@ -43,7 +43,7 @@ class Milvus:
         self._server_start(base_dir)
         self._base_config_set(**kwargs)
         self.collection = self._create_collection()
-        self.collection.set_properties(properties={"collection.ttl.seconds": 1800})
+        # self.collection.set_properties(properties={"collection.ttl.seconds": 1800})
         self.list_collections()
         print(f"\nMlilvus init done.")
 
@@ -66,7 +66,7 @@ class Milvus:
         self._index_type = ('IVF_FLAT', 'FLAT', 'IVF_SQ8', 'IVF_SQ8H', 'IVF_PQ', 'HNSW', 'ANNOY')
         self._metric_type = ('L2', 'IP')  # 度量类型 L2->欧式距离,不支持余弦相似度，IP->内积
         self._nlist = kwargs.get('nlist', 1024)
-        self._nprobe = kwargs.get('nprobe', 256//13)
+        self._nprobe = kwargs.get('nprobe', 256 // 13)
 
         # 搜索参数预备
         self._prepared_search_param = {
@@ -130,7 +130,7 @@ class Milvus:
                                   description="collection faces_info_collection")
 
         collection = Collection(name=self._collection_name, schema=schema,
-                                properties={"collection.ttl.seconds": 15})
+                                properties={"collection.ttl.seconds": 1800})
         print("\ncollection created:", self._collection_name)
         return collection
 
@@ -151,7 +151,7 @@ class Milvus:
         # Output: {'loading_progress': 100%}
 
     # 向集合中插入实体
-    def insert_from_files(self, file_paths: list):
+    def insert_from_files(self, file_paths: list):  ### failed
         print("\nInsert data...")
         # 3. insert entities
         task_id = utility.do_bulk_insert(collection_name=self._collection_name,
@@ -200,8 +200,6 @@ class Milvus:
         # search_vectors可以是多个向量
         print(f"\nSearching ...")
         results = self.collection.search(data=search_vectors, **self._collection_search_param)
-        print(f"Search successfully !")
-
         print("collecting results ...")
         ret_results = [[] for _ in range(len(results))]
         for i, hits in enumerate(results):
@@ -211,7 +209,6 @@ class Milvus:
                     "id": hit.entity.get(self._id_field_param['name']),
                     "name": hit.entity.get(self._name_field_param['name'])
                 })
-        print(f"Collecting results successfully !")
         pprint.pprint(f"Search results : {ret_results}")
         return ret_results
 

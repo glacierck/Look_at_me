@@ -1,118 +1,122 @@
 import itertools
 from pathlib import Path
 
+import cv2
 import numpy as np
-
-from milvus_lite import Milvus
+from numpy import ndarray
+from numpy.lib.npyio import NpzFile
+from .milvus_lite import Milvus
 from my_insightface.insightface.app.face_analysis import MatchInfo
-from my_insightface.insightface.app.real_time_tracker import Face, Target
-from my_insightface.insightface.data.image import Image
+from my_insightface.insightface.app.real_time_tracker import Target, Detector, Extractor
+
+from my_insightface.insightface.data.image import LightImage
+from my_insightface.insightface.utils.my_tools import get_digits, get_nodigits
 
 
 class MilvusRealTime:
-    def __init__(self, **kwargs):
-        self._match_threshold = 0.5
-        self.milvus = Milvus()
-        self.__image_root = Path(__file__).parents[1].absolute() / 'data' / 'images'
-        self.kwargs = kwargs
+    def __init__(self, test_folder: str = 'test_01', img_folder: str = 'known'):
+        self._match_threshold: float = 0.5
+        self._milvus = Milvus()
+        self._image_root = Path(__file__).parent.absolute() / 'data'
+        self._image_folder: Path = self._image_root / test_folder / img_folder
+        self._npz_path: Path = self._image_folder / 'faces.npz'
 
-    def get_faces_from_npys(self, img_folder: str, test_folder: str) -> list[Face]:
+    def _get_faces_from_images(self, **kwargs) -> NpzFile:
+        ext_names = {'.jpg', '.png', '.jpeg'}
+        detector = kwargs.get('detector', Detector())
+        extractor = kwargs.get('extractor', Extractor())
+        faces2npz = []
+        img_paths = [str(img_path) for img_path in self._image_folder.glob('*')
+                     if img_path.suffix in ext_names]
+        if not img_paths:
+            raise FileNotFoundError(f'no image found in {img_paths}')
+        print(f'\nloading faces from {self._image_folder}')
+        for i, img_path in enumerate(img_paths):
+            print(f'processing {i}/{len(img_paths)} image from {img_path}')
+            try:
+                img_ndarray = cv2.imread(img_path)
+                if img_ndarray is None:
+                    raise FileNotFoundError
+            except FileNotFoundError:
+                print(f"The file at {img_path} does not exist or is not a valid image.")
+                return
+            img = LightImage(img_ndarray, [],
+                             (0, 0, img_ndarray.shape[1] - 1, img_ndarray.shape[0] - 1))
+            detector(img)
+            if len(img.faces) > 1:
+                print(f'Warning: more than one face detected in {img_path}')
+                continue
+                # raise ValueError('face should be one')
+            normed_embedding = extractor(img, bbox=img.faces[0][0],
+                                         kps=img.faces[0][1], det_score=img.faces[0][2])
+            # name consists of digits and letters: 123abc
+            file_name = Path(img_path).stem
+            _id = get_digits(file_name)
+            if not _id:
+                print(f'Warning: no id found in {img_path}')
+                continue
+            _name = get_nodigits(file_name)
+            faces2npz.append([_id, _name, normed_embedding])
+        self._faces_to_npz(faces2npz)
+        try:
+            faces_npz: NpzFile = np.load(str(self._npz_path))
+        except OSError:
+            print('npz file not found,after np.savez_compressed')
+            raise
+        else:
+            return faces_npz
 
-        img_dir = self.__image_root / test_folder / img_folder
-        id_npy = img_dir / 'id.npy'  # shape: (n,)
-        name_npy = img_dir / 'name.npy'  # shape: (n,)
-        kps_npy = img_dir / 'kps.npy'  # shape: (n, 5, 2)
-        bbox_npy = img_dir / 'bbox.npy'  # shape: (n, 4)
-        embedding_npy = img_dir / 'embedding.npy'  # shape: (n, 512)
-        normed_embedding_npy = img_dir / 'normed_embedding.npy'  # shape: (n, 512)
-        if not (
-                id_npy.exists() and name_npy.exists() and embedding_npy.exists() and kps_npy.exists() and bbox_npy.exists()):
-            print('npy files not exists')
-            return []
-
-        print('\nloading registered faces from npy files')
-        ids = np.load(str(id_npy)).astype(np.int64)
-        names = np.load(str(name_npy))
-        kps = np.load(str(kps_npy))
-        bboxes = np.load(str(bbox_npy))
-        embeddings = np.load(str(embedding_npy)).astype(np.float32)
-        assert len(ids) == len(names) == len(kps) == len(bboxes) == len(embeddings), \
-            'npy files not match'
-        faces = []
-        for i in range(len(ids)):
-            face = Face(id=ids[i], name=names[i], kps=kps[i],
-                        bbox=bboxes[i], embedding=embeddings[i])
-            faces.append(face)
-        # milvus 相似度设置为IP用的是normed_embedding
-        normed_embeddings = np.array([face.normed_embedding for face in faces], dtype=np.float32)
-        np.save(str(normed_embedding_npy), normed_embeddings)
-        if self.milvus.has_collection:
-            assert len(ids) == len(names) == len(normed_embeddings), 'npy files not match'
-            # self.milvus.insert_from_files(
+    def _get_faces_from_npz(self, **kwargs) -> None:
+        """
+        load faces from npz files
+        :return:
+        """
+        faces_npz = None
+        print('\nloading registered faces from npz files')
+        try:
+            if kwargs.get('refresh', False):
+                raise OSError
+            faces_npz: NpzFile = np.load(str(self._npz_path))
+        except (OSError, FileNotFoundError):
+            print('npz file not found, loading from images')
+            faces_npz: NpzFile = self._get_faces_from_images(**kwargs)
+        finally:
+            # shape: (n,)
+            ids: ndarray = faces_npz['ids']
+            mask = ids != ''
+            ids = ids[mask].astype(np.int64)
+            # shape: (n,)
+            names: ndarray = faces_npz['names'][mask]
+            # shape: (n, 512)
+            normed_embeddings: ndarray = faces_npz['normed_embeddings'][mask].astype(np.float32)
+            faces_npz.close()
+        if not (len(ids) == len(names) == len(normed_embeddings)):
+            raise ValueError('npz files not match')
+        if not (ids.all() or names.all() or normed_embeddings.all()):
+            raise ValueError('npz files not complete')
+        if self._milvus.has_collection:
+            # self._milvus.insert_from_files(
             # file_paths=[str(id_npy), str(name_npy), str(normed_embedding_npy)])
-            self.milvus.insert([[id for id in ids],
-                                [name for name in names],
-                                [embedding for embedding in normed_embeddings]
-                                ])
+            self._milvus.insert([[_id for _id in ids],
+                                 [name for name in names],
+                                 [embedding for embedding in normed_embeddings]
+                                 ])
 
-        return faces
+    def _faces_to_npz(self, faces: list[list]) -> None:
 
-    def faces_to_npys(self, faces: list[Face], img_folder: str, test_folder: str) -> None:
-        img_dir = self.__image_root / test_folder / img_folder
-        id_npy = img_dir / 'id.npy'  # shape: (n,) , int 32
-        name_npy = img_dir / 'name.npy'  # shape: (n,), varchar
-        kps_npy = img_dir / 'kps.npy'  # shape: (n, 5, 2), float32
-        bbox_npy = img_dir / 'bbox.npy'  # shape: (n, 4), float32
-        embedding_npy = img_dir / 'embedding.npy'  # shape: (n, 512) , float32
-        ids, names, kps, bboxes, embeddings = [], [], [], [], []
+        ids, names, embeddings = [], [], []
         for face in faces:
-            ids.append(face.id)
-            names.append(face.name)
-            kps.append(face.kps)
-            bboxes.append(face.bbox)
-            embeddings.append(face.embedding)
-        np.save(str(id_npy), ids)
-        np.save(str(name_npy), names)
-        np.save(str(kps_npy), kps)
-        np.save(str(bbox_npy), bboxes)
-        np.save(str(embedding_npy), embeddings)
-        print('\nsave target faces to npy files done')
-
-    def load_registered_faces(self, detector, extractor, img_folder: str, **kwargs) -> list[Face]:
-        from ..utils.my_tools import flatten_list
-        from ..data.image import Image, get_images
-        test_folder = kwargs.get('test_folder', None)
-        refresh = kwargs.get('refresh', False)
-        if not refresh:
-            self.registered_faces = self.get_faces_from_npys(img_folder, test_folder)
-        if self.registered_faces:
-            print(f'\nload  {len(self.registered_faces)} registered_faces done')
-            if self.milvus and self.milvus.get_entity_num:
-                print('\n load registered faces to milvus done')
-            return self.registered_faces
-
-        print('\nloading registered faces from images')
-        # 根据给出的图片folder，加载所有的人脸图片，返回一个Face对象的列表
-        images: list[Image] = get_images(img_folder=img_folder, **kwargs)
-        assert len(images) > 0, 'No images found in ' + img_folder
-        assert detector, 'detector is None'
-        assert extractor, 'extractor is None'
-        res = []
-        for image in images:
-            detector(image)
-            extractor(image)
-            res.append(image.faces)
-        self.registered_faces = list(flatten_list(res))
-        assert self.registered_faces, f'No faces found in folder: {img_folder} !'
-        print(f'\nload  {len(self.registered_faces)} registered_faces done')
-
-        self.faces_to_npys(self.registered_faces, img_folder, test_folder)
-        return self.registered_faces
+            ids.append(face[0])
+            names.append(face[1])
+            embeddings.append(face[2])
+        np.savez_compressed(str(self._npz_path),
+                            ids=ids, names=names, normed_embeddings=embeddings)
+        print(f'\nsave {len(faces)} target faces to Npzfile done')
 
     def _search_by_milvus(self, targets: list[Target]) -> list[Target]:
 
         normed_embeddings: list[np.ndarray] = [target.normed_embedding for target in targets]
-        results: list[list[dict]] = self.milvus.search(normed_embeddings)
+        results: list[list[dict]] = self._milvus.search(normed_embeddings)
 
         for i, result in enumerate(results):
             result = result[0]  # top_k=1
@@ -121,27 +125,40 @@ class MilvusRealTime:
                                                     face_id=result['id'], name=result['name']))
         return targets
 
-    def face_match(self, targets: list[Target], match_thresh: float = 0.6) -> list[Target]:
+    @property
+    def server_params(self) -> bool:
+        return self._milvus.milvus_params
+
+    @property
+    def total_faces(self) -> int:
+        return self._milvus.get_entity_num()
+
+    def load_registered_faces(self, detector: Detector, extractor: Extractor, refresh: bool = False) -> None:
+        kwargs = {'detector': detector, 'extractor': extractor, 'refresh': refresh}
+        self._get_faces_from_npz(**kwargs)
+        return
+
+    def face_match(self, targets: list[Target], match_thresh: float = 0.6) -> list[Target] | None:
         """
         人脸匹配，返回一cur_face对象，cur_face设置了match_info，作为匹配结果
         if_matched为True表示匹配成功，False表示匹配的score低于阈值
         result为True表示匹配正确，False表示匹配失败
         score为匹配的分数，越高越好
-        :param cur_images: 多张图片，包含多个人脸，等待匹配
+        :param targets: target列表，每个target包含了人脸的信息
         :param match_thresh: 匹配的阈值，大于该值才算匹配成功，计算方式这里都是normed_embedding的内积
         :return: cur_face
         """
         # 类型检查
         if not isinstance(targets, list):
             raise TypeError('targets is not a list')
-        if not self.registered_faces:
-            raise ValueError('registered_faces is empty !')
+        if not targets:
+            return []
         if not 0.0 <= match_thresh <= 1.0:
             raise ValueError('match_thresh is not in [0.0,1.0]')
         self._match_threshold = match_thresh
-        assert self.milvus, 'milvus is off'
+        assert self._milvus, '_milvus is off'
         return self._search_by_milvus(targets)
 
     def stop_milvus(self):
-        if self.milvus and self.milvus.has_collection:
-            self.milvus.shut_down()
+        if self._milvus and self._milvus.has_collection:
+            self._milvus.shut_down()

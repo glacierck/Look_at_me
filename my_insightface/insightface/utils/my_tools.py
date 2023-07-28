@@ -3,7 +3,6 @@ from __future__ import annotations
 from ..app.common import Face
 
 
-
 def removesuffix(input_string, suffix):
     if suffix and input_string.endswith(suffix):
         return input_string[:-len(suffix)]
@@ -22,5 +21,9 @@ def flatten_list(nested_list):
         yield nested_list
 
 
-def strip_digits(s: str) -> str:
+def get_digits(s: str) -> str:
+    return ''.join(c for c in s if c.isdigit())
+
+
+def get_nodigits(s: str) -> str:
     return ''.join(c for c in s if not c.isdigit())

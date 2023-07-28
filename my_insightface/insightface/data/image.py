@@ -3,7 +3,7 @@ import cv2
 from pathlib import Path
 import numpy as np
 from ..app.common import Face
-from ..utils.my_tools import strip_digits
+from ..utils.my_tools import get_nodigits
 from typing import NamedTuple
 
 
@@ -96,7 +96,7 @@ class Image:
     def name(self):
         chars = '_-. '
         name = self._name.strip(chars)
-        return strip_digits(name)
+        return get_nodigits(name)
 
     def __add__(self, other: Image):
         assert isinstance(other, Image), f"other is not Image type !"

@@ -34,8 +34,7 @@ def main():
         raise e
     finally:
         print('ave_fps = ', test.show_times / COST_TIME['image_show'][0])
-        # test.test_stop()
-
+        test.test_stop()
 
 if __name__ == '__main__':
     main()

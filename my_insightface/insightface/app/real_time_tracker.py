@@ -8,10 +8,8 @@ from typing import NamedTuple
 
 import numpy as np
 
-from milvus_standalone.milvus_for_realtime import MilvusRealTime
 from .sort_plus import associate_detections_to_trackers, KalmanBoxTracker
 from .common import Face
-from .face_analysis import Milvus2Search
 from pathlib import Path
 import cv2
 from timeit import default_timer as current_time
@@ -41,9 +39,10 @@ class MultiThreadFaceAnalysis:
         self._test_folder = test_folder
         self._video = None
         self._camera = Camera(test_folder)
-        self._identifier = Identifier()
-        self._screen = Screen()
         self._detect = Detector()
+        self._identifier = Identifier(self._detect)
+        self._screen = Screen()
+
 
     def video_read(self, jobs: queue.Queue):
         print('video_read start')
@@ -55,7 +54,7 @@ class MultiThreadFaceAnalysis:
         while not threads_done.is_set():
             try:
                 detect_job = jobs.get(timeout=1)
-                print('image2detect.qsize() = ', jobs.qsize())
+                # print('image2detect.qsize() = ', jobs.qsize())
             except queue.Empty:
                 print('detect_thread,queue.Empty')
                 break
@@ -70,7 +69,7 @@ class MultiThreadFaceAnalysis:
                 to_update = jobs.get(timeout=2)
                 ide_res = self._identifier.identified_results(to_update)
                 results.put(ide_res)
-                print(f'detect2identify.qsize() = {jobs.qsize()}')
+                # print(f'detect2identify.qsize() = {jobs.qsize()}')
             except queue.Empty:
                 print('detect2identify is empty')
                 break
@@ -100,15 +99,15 @@ class MultiThreadFaceAnalysis:
                 if sleep_time == 0:
                     print(f'Warning: sleep_time = {sleep_time}')
                 sleep(sleep_time)
-                print(f'finally_show_queue.qsize() = {jobs.qsize()}')
+                # print(f'finally_show_queue.qsize() = {jobs.qsize()}')
 
             except queue.Empty:
                 print('finally_show_queue is empty')
                 break
 
-    # def test_stop(self):
-    #     self.stop_milvus()
-    #     print('test_of_face_analysis ends!')
+    def test_stop(self):
+        self._identifier.stop_milvus()
+        print('test_of_face_analysis ends!')
 
 
 class Camera:
@@ -128,7 +127,7 @@ class Camera:
             if ret:
                 results.put(
                     LightImage(nd_arr=frame, faces=[], screen_scale=(0, 0, frame.shape[1] - 1, frame.shape[0] - 1)))
-                print(f'video_2_detect_queue.qsize() = {results.qsize()}')
+                # print(f'video_2_detect_queue.qsize() = {results.qsize()}')
                 self._imgs_of_video += 1
             else:
                 break
@@ -302,7 +301,7 @@ class Target:
         blue = (127, 0, 0)
         if self.if_matched:
             # 有匹配对象
-            if self.match_info.score > 0.5:
+            if self.match_info.score > 0.4:
                 bbox_color = green
                 name_color = green
             else:
@@ -316,20 +315,24 @@ class Target:
 
 
 class Identifier:
-    def __init__(self, max_age=120, min_hits=3, iou_threshold=0.3):
+    def __init__(self, detector,max_age=120, min_hits=3, iou_threshold=0.3):
+        from milvus_standalone.milvus_for_realtime import MilvusRealTime
         self._targets: dict[int, Target] = {}
         self.max_age = max_age  # 超过该帧数没被更新就删除
         self.min_hits = min_hits  # 至少被检测到的次数才算
         self.iou_threshold = iou_threshold
         self._recycled_ids = []
         self._extractor = Extractor()
+        self._detector = detector
         self._milvus = MilvusRealTime()
+        self._milvus.load_registered_faces(extractor=self._extractor,
+                                           detector=self._detector,refresh=False)
         self._frame_cnt = 0
 
     def identified_results(self, image2identify: LightImage) -> LightImage:
         self._update(image2identify)
         self._extract(image2identify)
-        # match_faces.....
+        self._search()
         image2identify.faces.clear()
         for i, target in enumerate(self._targets.values()):
             if not target.in_screen(self.min_hits):
@@ -345,6 +348,9 @@ class Identifier:
         else:
             self._frame_cnt = 0
         return image2identify
+
+    def stop_milvus(self):
+        self._milvus.stop_milvus()
 
     def _update(self, image2update: LightImage):
         # 更新目标
@@ -401,16 +407,16 @@ class Identifier:
             else:
                 heapq.heappush(self._recycled_ids, k)
 
-    def _search(self, image2search: LightImage):
-
+    def _search(self):
+        if not self._milvus:
+            raise ValueError('milvus is not initialized')
         self._milvus.face_match([tar for tar in self._targets.values()
-                                 if tar.normed_embedding.all()], 0.6)
-        return image2search
+                                 if tar.normed_embedding.all()], 0.0)
 
     def _extract(self, image2extract: LightImage):
         for tar in self._targets.values():
             if tar.rec_satified:
-                tar.normed_embedding = self._extractor(image2extract,tar.bbox,tar.kps,tar.score)
+                tar.normed_embedding = self._extractor(image2extract, tar.bbox, tar.kps, tar.score)
         return image2extract
 
     def _generate_id(self):
