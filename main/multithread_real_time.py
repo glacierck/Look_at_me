@@ -10,7 +10,7 @@ rec_2_show_queue = Queue(maxsize=400)
 
 def main():
     test_folder = 'test_04'
-    test = MultiThreadFaceAnalysis(test_folder=test_folder)
+    test = MultiThreadFaceAnalysis(test_folder=test_folder,app='ip_webcam', approach='usb')
     try:
         video_read_thread = Thread(target=test.video_read, args=(video_2_detect_queue,))
         detect_thread = Thread(target=test.image2detect,

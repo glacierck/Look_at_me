@@ -23,10 +23,22 @@ The code of InsightFace Python Library is released under the MIT License. There 
 1. insightface
 2. milvus
 3. sqlite3
-4. pyqt5
-5. django
+5. flask
 
 ## Project finishing log 📝
+### 2023-8-1
+### tasks
+1. test the new milvus server 
+
+
+
+## 2023-7-31
+### tasks
+1.  delete the useless process of start milvus server ✅
+2. try to make the milvus dynamic which means the server can be insert and delete dynamically ✅ 
+3. add func check entries before insert data into milvus ✅
+
+
 ### 2023-7-10
 ## Still working on
 1. maybe the way of reading data from files can be optimized by asynchronous reading ⏳

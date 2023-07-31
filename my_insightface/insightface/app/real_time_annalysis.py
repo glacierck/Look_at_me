@@ -1,23 +1,23 @@
 from __future__ import annotations
 
-import collections
+
 import heapq
 import queue
-from collections import deque
+
 from time import sleep
 from threading import Event
 import numpy as np
 from numpy import ndarray
-from sympy.core.random import random
+
 
 from .common import Face
 from .face_analysis import Milvus2Search
 from pathlib import Path
 import cv2
+from ..data import LightImage
 from timeit import default_timer as current_time
 import functools
-from my_insightface.insightface.data.image import LightImage, draw_on
-from my_insightface.insightface.app.face_analysis import MatchInfo
+from milvus_standalone import MatchInfo
 from scipy.optimize import linear_sum_assignment
 
 COST_TIME = {}

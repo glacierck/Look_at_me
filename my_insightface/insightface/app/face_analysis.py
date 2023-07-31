@@ -8,26 +8,21 @@
 from __future__ import division, annotations
 
 import itertools
-from typing import AnyStr, List, Tuple, NamedTuple
+from typing import List
 
 from pathlib import Path
 
 import numpy as np
 import onnxruntime
-import cv2
+
+from milvus_standalone.common import MatchInfo
 from ..app.common import Face
 from ..model_zoo import model_zoo
 from ..utils import ensure_available
 from milvus_standalone.milvus_lite import Milvus
 from ..data.image import Image
 
-__all__ = ['FaceAnalysis']
-
-
-class MatchInfo(NamedTuple):
-    score: float
-    face_id: int
-    name: str
+__all__ = ['FaceAnalysis','Milvus2Search']
 
 
 class FaceAnalysis:

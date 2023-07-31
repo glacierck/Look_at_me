@@ -2,11 +2,7 @@ from __future__ import annotations
 
 from ..app.common import Face
 
-
-def removesuffix(input_string, suffix):
-    if suffix and input_string.endswith(suffix):
-        return input_string[:-len(suffix)]
-    return input_string
+__all__ = ['flatten_list', 'get_digits', 'get_nodigits']
 
 
 # 展开嵌套列表,最底层元素是Face或者Image对象

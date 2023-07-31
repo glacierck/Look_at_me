@@ -1,2 +1,2 @@
-from .image import get_images
+from .image import *
 from .pickle_object import get_object

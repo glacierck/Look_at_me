@@ -7,6 +7,7 @@ from threading import Event
 from typing import NamedTuple
 
 import numpy as np
+import requests
 
 from .sort_plus import associate_detections_to_trackers, KalmanBoxTracker
 from .common import Face
@@ -15,10 +16,13 @@ import cv2
 from timeit import default_timer as current_time
 import functools
 from my_insightface.insightface.data.image import LightImage
-from my_insightface.insightface.app.face_analysis import MatchInfo
+from milvus_standalone.common import MatchInfo
+import subprocess
 
 COST_TIME = {}
 threads_done = Event()
+__all__ = ['MultiThreadFaceAnalysis', 'COST_TIME','threads_done', 'Target',
+           'Camera', 'Detector', 'Identifier', 'Screen','Extractor']
 
 
 def cost_time_recording(func):
@@ -34,26 +38,26 @@ def cost_time_recording(func):
 
 
 class MultiThreadFaceAnalysis:
-    def __init__(self, test_folder: str):
+    def __init__(self, test_folder: str, **kwargs):
         self.show_times = 0
         self._test_folder = test_folder
         self._video = None
-        self._camera = Camera(test_folder)
+        self.camera = Camera(**kwargs)  # http://192.168.0.102:4747/video
         self._detect = Detector()
         self._identifier = Identifier(self._detect)
         self._screen = Screen()
 
-
     def video_read(self, jobs: queue.Queue):
         print('video_read start')
-        self._camera.video_read(jobs)
+        # self.camera.read_video_file(jobs)
+        self.camera.read_camera(jobs)
 
     @cost_time_recording
     def image2detect(self, jobs: queue.Queue, results: queue.Queue):
         print('detect_thread start')
         while not threads_done.is_set():
             try:
-                detect_job = jobs.get(timeout=1)
+                detect_job = jobs.get(timeout=10)
                 # print('image2detect.qsize() = ', jobs.qsize())
             except queue.Empty:
                 print('detect_thread,queue.Empty')
@@ -66,7 +70,7 @@ class MultiThreadFaceAnalysis:
         print('detect2identify start')
         while not threads_done.is_set():
             try:
-                to_update = jobs.get(timeout=2)
+                to_update = jobs.get(timeout=10)
                 ide_res = self._identifier.identified_results(to_update)
                 results.put(ide_res)
                 # print(f'detect2identify.qsize() = {jobs.qsize()}')
@@ -81,13 +85,13 @@ class MultiThreadFaceAnalysis:
         print('image_continued_show start')
         fps_start = 0
         fps_end = 0
-        while True:
+        while not threads_done.is_set():
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 threads_done.set()
                 break
             try:
                 fps_start = start = current_time()
-                to_update = jobs.get(timeout=2)
+                to_update = jobs.get(timeout=10)
                 if fps_end != 0:
                     cv2.putText(to_update.nd_arr, f'fps = {1 / (fps_start - fps_end):.2f}',
                                 (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
@@ -98,7 +102,7 @@ class MultiThreadFaceAnalysis:
                 sleep_time = 0.022 - (end_time - start) if (end_time - start) < 0.022 else 0
                 if sleep_time == 0:
                     print(f'Warning: sleep_time = {sleep_time}')
-                sleep(sleep_time)
+                # sleep(sleep_time)
                 # print(f'finally_show_queue.qsize() = {jobs.qsize()}')
 
             except queue.Empty:
@@ -111,16 +115,59 @@ class MultiThreadFaceAnalysis:
 
 
 class Camera:
-    def __init__(self, test_folder: str):
+    def __init__(self, app: str, approach: str, test_folder: str = 'test_01', resolution: tuple = (1920, 1080)):
+        self._imgs_of_video = 0
         self._test_folder = test_folder
+        self._resolution = resolution
+        order = [app, approach]
         self._video = None
+        match order:
+            case ['laptop']:
+                self._url = 0
+            case ['ip_webcam', 'usb']:
+                self._url = 'http://localhost:8080/video'
 
-    def video_read(self, results: queue.Queue):
+                # 定义你的命令
+                cmd = 'adb forward tcp:8080 tcp:8080'
+                # 使用subprocess运行命令
+                process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                # 获取命令输出
+                stdout, stderr = process.communicate()
+                # 如果有输出，打印出来
+                if stdout:
+                    print('STDOUT:{}'.format(stdout))
+                if stderr:
+                    raise ValueError('STDERR:{}'.format(stderr))
+
+            case ['ip_webcam', 'wifi']:
+                self._url = 'http://192.168.0.103:8080/video'
+
+            # url = url + f'/video?{resolution[0]}x{resolution[1]}'
+        try:
+            self._video = cv2.VideoCapture(self._url)
+            # if not self._video.isOpened():
+            #     # 如果打开视频失败，尝试发送请求到链接
+            #     response = requests.get("http://192.168.0.102:4747/override")
+            #     response.raise_for_status()  # 如果响应状态码不是200，引发HTTPError异常
+            #
+            #     # 再次尝试打开视频
+            #     self._video = cv2.VideoCapture(str(url))
+            if not self._video.isOpened():
+                raise ValueError(
+                    f"Could not open video source {self._url} even after sending request to override link")
+
+        except requests.exceptions.RequestException as e:
+            # 处理任何可能的请求错误
+            print(f"Request to override link failed with error: {e}")
+        # 设置帧数
+        self._video.set(cv2.CAP_PROP_FPS, 60)
+        self.fps = self._video.get(cv2.CAP_PROP_FPS)
+
+    def read_video_file(self, results: queue.Queue):
         video_dir = Path(f'..\\my_insightface\\insightface\\data\\images\\{self._test_folder}\\video')
         video_path = list(video_dir.glob('*.mp4'))[0]
         assert video_path.exists() and video_path.is_file(), f'video_path = {video_path}'
         self._video = cv2.VideoCapture(video_path.as_posix())
-        self._imgs_of_video = 0
         print('video_read start')
         while not threads_done.is_set():
             ret, frame = self._video.read()
@@ -131,6 +178,21 @@ class Camera:
                 self._imgs_of_video += 1
             else:
                 break
+
+    def read_camera(self, results: queue.Queue):
+        print('camera_read start')
+        try:
+            while not threads_done.is_set():
+                ret, frame = self._video.read()
+                if ret:
+                    results.put(
+                        LightImage(nd_arr=frame, faces=[], screen_scale=(0, 0, frame.shape[1] - 1, frame.shape[0] - 1)))
+                    # print(f'video_2_detect_queue.qsize() = {results.qsize()}')
+                    self._imgs_of_video += 1
+                else:
+                    break
+        finally:
+            self._video.release()
 
 
 class Detector:
@@ -315,8 +377,8 @@ class Target:
 
 
 class Identifier:
-    def __init__(self, detector,max_age=120, min_hits=3, iou_threshold=0.3):
-        from milvus_standalone.milvus_for_realtime import MilvusRealTime
+    def __init__(self, detector, max_age=120, min_hits=3, iou_threshold=0.3,refresh=False):
+        from database.milvus_standalone import MilvusRealTime
         self._targets: dict[int, Target] = {}
         self.max_age = max_age  # 超过该帧数没被更新就删除
         self.min_hits = min_hits  # 至少被检测到的次数才算
@@ -324,9 +386,10 @@ class Identifier:
         self._recycled_ids = []
         self._extractor = Extractor()
         self._detector = detector
-        self._milvus = MilvusRealTime()
-        self._milvus.load_registered_faces(extractor=self._extractor,
-                                           detector=self._detector,refresh=False)
+        self._milvus = MilvusRealTime(test_folder='test_02',refresh=refresh)
+        if not refresh:
+            self._milvus.load_registered_faces(extractor=self._extractor,
+                                               detector=self._detector, refresh=False)
         self._frame_cnt = 0
 
     def identified_results(self, image2identify: LightImage) -> LightImage:
@@ -475,11 +538,21 @@ class Screen:
         self.font_scale = 1
         # 设置文本的位置，将文本放在人脸框的下方
         text_position = (box[0], box[3] + 22)
-        # 添加文本
+        # ft2 = cv2.freetype.createFreeType2()
+        # ft2.loadFontData(fontFileName='simhei.ttf', id=0)
+        # ft2.putText(img=dimg,
+        #             text=name,
+        #             org=text_position,
+        #             fontHeight=20,
+        #             color=color,
+        #             thickness=-1,
+        #             line_type=cv2.LINE_AA,
+        #             bottomLeftOrigin=True)
+        # 添加文本  中文问题还没有解决
         cv2.putText(img=dimg,
                     text=name,
                     org=text_position,
-                    fontFace=cv2.FONT_HERSHEY_COMPLEX,
+                    fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=self.font_scale,
                     color=color,
                     thickness=1,

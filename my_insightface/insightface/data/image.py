@@ -6,6 +6,8 @@ from ..app.common import Face
 from ..utils.my_tools import get_nodigits
 from typing import NamedTuple
 
+__all__ = ['LightImage','Image']
+
 
 def draw_on(image2draw_on) -> np.ndarray:
     dimg = image2draw_on.nd_arr

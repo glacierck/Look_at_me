@@ -1,4 +1,3 @@
-import itertools
 from pathlib import Path
 
 import cv2
@@ -6,17 +5,17 @@ import numpy as np
 from numpy import ndarray
 from numpy.lib.npyio import NpzFile
 from .milvus_lite import Milvus
-from my_insightface.insightface.app.face_analysis import MatchInfo
-from my_insightface.insightface.app.real_time_tracker import Target, Detector, Extractor
+from .common import MatchInfo
+from my_insightface import Target, Detector, Extractor, LightImage
+from my_insightface import get_nodigits, get_digits
 
-from my_insightface.insightface.data.image import LightImage
-from my_insightface.insightface.utils.my_tools import get_digits, get_nodigits
+__all__ = ['MilvusRealTime']
 
 
 class MilvusRealTime:
-    def __init__(self, test_folder: str = 'test_01', img_folder: str = 'known'):
+    def __init__(self, test_folder: str = 'test_01', img_folder: str = 'known', refresh: bool = False):
         self._match_threshold: float = 0.5
-        self._milvus = Milvus()
+        self._milvus = Milvus(refresh=refresh)
         self._image_root = Path(__file__).parent.absolute() / 'data'
         self._image_folder: Path = self._image_root / test_folder / img_folder
         self._npz_path: Path = self._image_folder / 'faces.npz'
@@ -39,7 +38,13 @@ class MilvusRealTime:
                     raise FileNotFoundError
             except FileNotFoundError:
                 print(f"The file at {img_path} does not exist or is not a valid image.")
-                return
+                try:
+                    byte_array = np.fromfile(img_path, dtype=np.uint8)
+                    img_ndarray = cv2.imdecode(byte_array, cv2.IMREAD_COLOR)
+                except FileNotFoundError:
+                    print(f"secondly,The file at {img_path} does not exist or is not a valid image.")
+                    return
+
             img = LightImage(img_ndarray, [],
                              (0, 0, img_ndarray.shape[1] - 1, img_ndarray.shape[0] - 1))
             detector(img)
@@ -81,26 +86,20 @@ class MilvusRealTime:
             print('npz file not found, loading from images')
             faces_npz: NpzFile = self._get_faces_from_images(**kwargs)
         finally:
-            # shape: (n,)
-            ids: ndarray = faces_npz['ids']
-            mask = ids != ''
-            ids = ids[mask].astype(np.int64)
-            # shape: (n,)
-            names: ndarray = faces_npz['names'][mask]
-            # shape: (n, 512)
-            normed_embeddings: ndarray = faces_npz['normed_embeddings'][mask].astype(np.float32)
+            ids: ndarray = faces_npz['ids']  # shape: (n,)
+            names: ndarray = faces_npz['names']  # shape: (n,)
+            normed_embeddings: ndarray = faces_npz['normed_embeddings']  # shape: (n, 512)
             faces_npz.close()
-        if not (len(ids) == len(names) == len(normed_embeddings)):
-            raise ValueError('npz files not match')
-        if not (ids.all() or names.all() or normed_embeddings.all()):
-            raise ValueError('npz files not complete')
-        if self._milvus.has_collection:
+        try:
             # self._milvus.insert_from_files(
             # file_paths=[str(id_npy), str(name_npy), str(normed_embedding_npy)])
-            self._milvus.insert([[_id for _id in ids],
-                                 [name for name in names],
-                                 [embedding for embedding in normed_embeddings]
-                                 ])
+            self._milvus.insert(ids, names, normed_embeddings)
+        except ValueError:
+            mask = ids != ''
+            ids = ids[mask].astype(np.int64)
+            names = names[mask]
+            normed_embeddings = normed_embeddings[mask]
+            self._milvus.insert(ids, names, normed_embeddings)
 
     def _faces_to_npz(self, faces: list[list]) -> None:
 
