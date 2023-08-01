@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from ..app.common import Face
 
 __all__ = ['flatten_list', 'get_digits', 'get_nodigits']

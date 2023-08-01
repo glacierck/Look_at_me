@@ -6,11 +6,10 @@ from numpy import ndarray
 from numpy.lib.npyio import NpzFile
 from pymilvus.orm import utility
 
-from .milvus_lite import Milvus
-from .common import MatchInfo
-from my_insightface.insightface.app.real_time_tracker import Target, Detector, Extractor
-from my_insightface.insightface.data.image import LightImage
-from my_insightface.insightface.utils.my_tools import get_digits, get_nodigits
+from milvus_lite_test import Milvus
+from database.milvus_standalone.common import MatchInfo
+from real_time_tracker import Target, Detector, Extractor, LightImage
+from my_insightface.insightface.utils.my_tools import get_nodigits, get_digits
 
 __all__ = ['MilvusRealTime']
 
@@ -24,8 +23,8 @@ class MilvusRealTime:
         :param refresh: if True, delete all data in milvus and re-register
         """
         self._match_threshold: float = 0.5
-        self._milvus = Milvus(refresh=refresh)
-        self._image_root = Path(__file__).parent.absolute() / 'data'
+        self._milvus = Milvus(refresh=refresh)  # 服务器完全重启时，refresh=True
+        self._image_root = Path(__file__).absolute().parents[2] / f'database\\milvus_standalone\\data'
         self._image_folder: Path = self._image_root / test_folder / img_folder
         self._npz_path: Path = self._image_folder / 'faces.npz'
 
@@ -142,7 +141,6 @@ class MilvusRealTime:
         return self._milvus.get_entity_num()
 
     def load2RAM(self):
-        print("Loading collection to RAM")
         self._milvus.collection.load()
         utility.wait_for_loading_complete(self._milvus.collection.name, timeout=10)
 
@@ -161,7 +159,7 @@ class MilvusRealTime:
     def add_new_face(self, id, name, normed_embedding):
 
         self._milvus.insert([np.array([id]), np.array([name]), np.array([normed_embedding])])
-        print("added new face:", id, name)
+        print("add new face:", id, name)
 
     def face_match(self, targets: list[Target], match_thresh: float = 0.6) -> list[Target] | None:
         """

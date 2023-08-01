@@ -6,14 +6,14 @@ from typing import NamedTuple
 import numpy as np
 import requests
 
+from my_insightface.insightface.app.sort_plus import associate_detections_to_trackers, KalmanBoxTracker
+from my_insightface.insightface.app.common import Face
 from pathlib import Path
 import cv2
 from timeit import default_timer as current_time
 import functools
 from my_insightface.insightface.data.image import LightImage
-from my_insightface.insightface.app.common import Face
 from database.milvus_standalone.common import MatchInfo
-from my_insightface.insightface.app.sort_plus import KalmanBoxTracker, associate_detections_to_trackers
 import subprocess
 
 COST_TIME = {}
@@ -88,7 +88,7 @@ class MultiThreadFaceAnalysis:
                 break
             try:
                 fps_start = start = current_time()
-                to_update = jobs.get(timeout=15)
+                to_update = jobs.get(timeout=10)
                 if fps_end != 0:
                     cv2.putText(to_update.nd_arr, f'fps = {1 / (fps_start - fps_end):.2f}',
                                 (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
@@ -187,7 +187,7 @@ class Camera:
 class Detector:
     def __init__(self):
         from my_insightface.insightface.model_zoo.model_zoo import get_model
-        root: Path = Path.cwd().parents[1].joinpath('models\\insightface\\det_2.5g.onnx')
+        root: Path = Path(__file__).absolute().parents[3].joinpath('models\\insightface\\det_2.5g.onnx')
         self.detector_model = get_model(root, providers=('CUDAExecutionProvider', 'CPUExecutionProvider'))
         prepare_params = {'ctx_id': 0,
                           'det_thresh': 0.5,
@@ -212,7 +212,7 @@ class Detector:
 class Extractor:
     def __init__(self):
         from my_insightface.insightface.model_zoo.model_zoo import get_model
-        root: Path = Path.cwd().parents[1].joinpath('models\\insightface\\irn50_glint360k_r50.onnx')
+        root: Path = Path(__file__).absolute().parents[3].joinpath('models\\insightface\\irn50_glint360k_r50.onnx')
         self.rec_model = get_model(root, providers=('CUDAExecutionProvider', 'CPUExecutionProvider'))
         self.rec_model.prepare(ctx_id=0)
 
@@ -368,7 +368,7 @@ class Target:
 class Identifier:
     def __init__(self, detector, max_age=120, min_hits=3, iou_threshold=0.3,
                  server_refresh=False, npz_refresh=False, test_folder='test_01'):
-        from database.milvus_standalone.milvus_for_realtime import MilvusRealTime
+        from milvus_test.milvus_for_realtime import MilvusRealTime
         """
         :param detector:
         :param max_age: 超过这个帧数没被更新就删除
@@ -390,12 +390,12 @@ class Identifier:
                                                detector=self._detector, refresh=npz_refresh)
         else:
             self._milvus.load2RAM()
-        self._frame_cnt = 1
+        self._frame_cnt = 0
 
         # test insert val
-        self._test_ids = np.random.choice(range(100000), 1000, replace=False).tolist()
-        self._test_names = (np.random.choice(range(100000), 1000, replace=False)).tolist()
-        test_embeddings = np.random.uniform(0.1, 1, (1000, 512))
+        self._test_ids = np.random.choice(range(100000), 100, replace=False).tolist()
+        self._test_names = (np.random.choice(range(100000), 100, replace=False)).tolist()
+        test_embeddings = np.random.uniform(0.1, 1, (100, 512))
         norms = np.linalg.norm(test_embeddings, axis=1,keepdims=True)
         self._test_embeddings = (test_embeddings / norms).tolist()
 
@@ -403,8 +403,7 @@ class Identifier:
         self._update(image2identify)
         self._extract(image2identify)
         # test 模拟搜索时候插入新的 可以慢速的插入，不影响平均fps
-        if (self._frame_cnt % 6 == 0 and len(self._test_ids)
-                and len(self._test_embeddings) and len(self._test_names)):
+        if self._frame_cnt % 10000 == 0: #
             self._milvus.add_new_face(self._test_ids.pop(), self._test_names.pop(),
                                       self._test_embeddings.pop())
         self._search()

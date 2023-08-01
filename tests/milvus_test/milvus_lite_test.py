@@ -1,12 +1,11 @@
 """ example.py based from pymilvus
 """
-from __future__ import annotations
-
 import pprint
-
+from pathlib import Path
 
 import numpy as np
 from milvus import default_server
+from numpy import ndarray
 
 from pymilvus import (
     connections,
@@ -14,7 +13,11 @@ from pymilvus import (
     Collection,
     utility
 )
+
 __all__ = ['Milvus']
+
+from sympy import ShapeError
+
 
 # This example shows how to:
 #   1. connect to Milvus server
@@ -38,12 +41,16 @@ __all__ = ['Milvus']
 # Data type of the data to insert must **match the schema of the collection**
 # otherwise Milvus will raise exception.
 class Milvus:
-    def __init__(self, base_dir: str = 'test_milvus', **kwargs: dict):
-        # 设置默认的Milvus服务器的存储位置。如果不设置，则默认会存储到 %APPDATA%/milvus-io/milvus-server 路径下
-        self._server_start(base_dir)
+    def __init__(self, name: str = 'Milvus_server', **kwargs: dict):
+        """
+        :param name: 设置默认的Milvus服务器的存储位置。如果不设置，则默认会存储到 %APPDATA%/milvus-io/milvus-server 路径下
+        :param kwargs:refresh 决定是否启动前先删除原有的数据
+        """
+        self._kwargs = {'refresh': False}
+        self._kwargs.update(kwargs)
+        self._server_start(name)
         self._base_config_set(**kwargs)
         self.collection = self._create_collection()
-        # self.collection.set_properties(properties={"collection.ttl.seconds": 1800})
         self.list_collections()
         print(f"\nMlilvus init done.")
 
@@ -52,21 +59,24 @@ class Milvus:
         # 定义常量名，包括集合名和字段名
         self._collection_name = kwargs.get('collection_name', 'Faces')
         # fields params
-        self._id_field_param = {'name': 'id',
-                                'dtype': DataType.INT64, 'description': "face_ids", 'is_primary': True}
+        self._id_field_param = {'name': 'id', 'dtype': DataType.INT64,
+                                'description': "face_ids", 'is_primary': True}
         self._name_field_param = {'name': 'name',
                                   'dtype': DataType.VARCHAR, 'description': "names of faces", 'max_length': 50}
         self._embedding_field_param = {'name': 'normed_embedding',
                                        'dtype': DataType.FLOAT_VECTOR, 'description': "face_normed_embedding vector",
                                        'dim': 512}
-
-        self._index_file_size = kwargs.get('index_file_size', 32)  # 存储索引的最大文件大小
-
+        # 存储索引的最大文件大小，单位为MB
+        self._index_file_size = kwargs.get('index_file_size', 32)
+        # 集合 存储数据的 分片数量
+        self._shards_num = kwargs.get('shards_num', 6)  # **test_needed to measure the performance**
         # 定义索引的参数
         self._index_type = ('IVF_FLAT', 'FLAT', 'IVF_SQ8', 'IVF_SQ8H', 'IVF_PQ', 'HNSW', 'ANNOY')
         self._metric_type = ('L2', 'IP')  # 度量类型 L2->欧式距离,不支持余弦相似度，IP->内积
-        self._nlist = kwargs.get('nlist', 1024)
-        self._nprobe = kwargs.get('nprobe', 256 // 13)
+        # 定义 聚类的数量
+        self._nlist = kwargs.get('nlist', 1024)  # **test_needed to measure the performance**
+        # 定义了搜索时候的 聚类数量
+        self._nprobe = kwargs.get('nprobe', 256 // 13)  # **test_needed to measure the performance**
 
         # 搜索参数预备
         self._prepared_search_param = {
@@ -86,7 +96,6 @@ class Milvus:
             "param": self._prepared_search_param,
             "anns_field": self._embedding_field_param['name'],
             "limit": self._top_k,
-            "expr": "id >= 0",
             "output_fields": [self._id_field_param['name'],
                               self._name_field_param['name']]}  # search doesn't support vector field as output_fields
 
@@ -105,10 +114,13 @@ class Milvus:
         }
         return params
 
-    @staticmethod
-    def _server_start(base_dir: str = 'test_milvus'):
-        default_server.set_base_dir(base_dir)
-        default_server.cleanup()
+    # 2023-7-31 base_dir* new: 指定文件路径
+    def _server_start(self, name: str = 'test_milvus'):
+        # 路径仍然是无效的，需要在内部修改代码
+        base_dir: Path = Path(__file__).absolute().parent.joinpath(name)
+        default_server.set_base_dir(base_dir.as_posix())
+        if self._kwargs['refresh']:  # 2023-7-31 new: 取消清除之前的数据，不需要每次都build index,collections
+            default_server.cleanup()
         default_server.start()
         print(f"Milvus server is running on {default_server.server_address}")
         print(f"\nCreate connection...")
@@ -118,37 +130,88 @@ class Milvus:
 
     # 创建一个的集合
     def _create_collection(self) -> Collection:
-        # 如果集合已存在，则删除集合
-        if utility.has_collection(self._collection_name):
+        if utility.has_collection(self._collection_name) and not self._kwargs['refresh']:
+            print(f"\nFound collection: {self._collection_name}")
+            # 2023-7-31 new: 如果存在直接返回 collection
+            return Collection(self._collection_name)
+        elif utility.has_collection(self._collection_name) and self._kwargs['refresh']:
+            print(f"\nFound collection: {self._collection_name}, deleting...")
             utility.drop_collection(self._collection_name)
+            print(f"Collection {self._collection_name} deleted.")
+
+        print(f"\nCollection {self._collection_name} is creating...")
         id_field = FieldSchema(**self._id_field_param)
         name_field = FieldSchema(**self._name_field_param)
         embedding_field = FieldSchema(**self._embedding_field_param)
-        field = [id_field, name_field, embedding_field]
-        # 允许了动态字段，即可以在插入数据时动态添加字段
-        schema = CollectionSchema(fields=field,
-                                  description="collection faces_info_collection")
-
-        collection = Collection(name=self._collection_name, schema=schema,
-                                properties={"collection.ttl.seconds": 1800})
-        print("\ncollection created:", self._collection_name)
+        fields = [id_field, name_field, embedding_field]
+        # 2023-7-31 new: 允许了动态字段，即可以在插入数据时动态添加字段
+        schema = CollectionSchema(fields=fields,
+                                  description="collection faces_info_collection", enable_dynamic_field=True)
+        # ttl指定了数据的过期时间，单位为秒，0表示永不过期
+        collection = Collection(name=self._collection_name, schema=schema, shards_num=self._shards_num,
+                                properties={"collection.ttl.seconds": 0})
+        print("collection created:", self._collection_name)
         return collection
 
-    def insert(self, entities: list):
+    @staticmethod
+    def _check_data(data: list[ndarray, ndarray, ndarray]) -> list:
+        ids, names, normed_embeddings = data
+        # 不可以有缺失值
+        if (ids == '').any() or (names == '').any() or (normed_embeddings == np.NAN).any():
+            raise ValueError('data cannot be ""or NAN')
+        # 条目数必须相同
+        if not (ids.shape[0]) == names.shape[0] == normed_embeddings.shape[0]:
+            raise ValueError('data is not same length')
+        # id必须是int64
+        if ids.dtype != np.int64:
+            ids = ids.astype(np.int64)
+        # id 必须唯一
+        if np.unique(ids).shape[0] != ids.shape[0]:
+            raise ShapeError('ids must be unique')
+        # name必须是str
+        if names.dtype != str: # np.str: deprecated
+            names = names.astype(str)
+        # normed_embeddings必须是float32
+        if normed_embeddings.dtype != np.float32:
+            normed_embeddings = normed_embeddings.astype(np.float32)
+        # normed_embeddings必须是512维
+        if normed_embeddings.shape[1] != 512:
+            raise ShapeError('normed_embeddings must be 512 dim')
+        # normed_embeddings必须是 单位向量
+        norms_after_normalization = np.linalg.norm(normed_embeddings, axis=1)
+        is_normalized = np.allclose(norms_after_normalization, 1)
+        if not is_normalized:
+            raise ValueError('normed_embeddings must be normalized')
+        # name长度不能超过50
+        if not all([len(name) <= 50 for name in names]):
+            raise ValueError('name length must be less than 50')
+
+        # 提取成列表
+        entries = [[_id for _id in ids],
+                   [name for name in names],
+                   [embedding for embedding in normed_embeddings]
+                   ]
+        return entries
+
+    def insert(self, entities: list[ndarray, ndarray, ndarray]):
+        """
+
+        :param entities: [[id:int64],[name:str,len<50],[normed_embedding:float32,shape(512,)]]
+        :return:
+        """
+        print("\nEntities check...")
+        entities = self._check_data(entities)
         print("\nInsert data...")
         self.collection.insert(entities)
-        self.collection.flush()
-        print("Done inserting data.")
-        print(self.get_entity_num)
-        self._create_index()
-        utility.wait_for_index_building_complete(self._collection_name)
+        # Call the flush API to make inserted data immediately available for search
+        self.collection.flush()  # 新插入的数据会自动构建index
+        print(f"Done inserting new {len(entities[0])}data.")
+        if not self.collection.has_index():  # 如果没有index，手动创建
+            print("\nCreate index...")
+            self._create_index()
         # 将collection 加载到到内存中
         self.collection.load()
-        # Check the loading progress and loading status
-        print(utility.load_state(self._collection_name))
-        # Output: <LoadState: Loaded>
-        print(utility.loading_progress(self._collection_name))
-        # Output: {'loading_progress': 100%}
+        utility.wait_for_loading_complete(self._collection_name, timeout=10)
 
     # 向集合中插入实体
     def insert_from_files(self, file_paths: list):  ### failed
@@ -190,10 +253,11 @@ class Milvus:
     def _create_index(self):
         self.collection.create_index(field_name=self._embedding_field_param['name'],
                                      index_params=self._index_param)
+        # 检查索引是否创建完成
+        utility.wait_for_index_building_complete(self._collection_name, timeout=60)
         print("\nCreated index:\n{}".format(self.collection.index().params))
 
     # 搜索集合
-    # Question: 是否可以进行异步搜索？
     # noinspection PyTypeChecker
     def search(self, search_vectors: list[np.ndarray]) -> list[list[dict]]:
         # search_vectors可以是多个向量
@@ -217,10 +281,10 @@ class Milvus:
         # 释放内存
         self.collection.release()
         print(f"\nReleased collection : {self._collection_name} successfully !")
-        self.collection.drop_index()
-        print(f"Drop index: {self._collection_name} successfully !")
-        self.collection.drop()
-        print(f"Drop collection: {self._collection_name} successfully !")
+        # self.collection.drop_index()
+        # print(f"Drop index: {self._collection_name} successfully !")
+        # self.collection.drop()
+        # print(f"Drop collection: {self._collection_name} successfully !")
         default_server.stop()
         print(f"Stop Milvus server successfully !")
 
@@ -233,7 +297,8 @@ class Milvus:
 
 def main():
     # 创建连接
-    Faces_server = Milvus()
+    # Faces_server = Milvus()
+    pass
 
 
 if __name__ == '__main__':

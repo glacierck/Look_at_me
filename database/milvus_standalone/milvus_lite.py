@@ -1,12 +1,10 @@
 """ example.py based from pymilvus
 """
-from __future__ import annotations
-
 import pprint
 from pathlib import Path
 
 import numpy as np
-from milvus import default_server
+from milvus import MilvusServer
 from numpy import ndarray
 
 from pymilvus import (
@@ -43,13 +41,16 @@ from sympy import ShapeError
 # Data type of the data to insert must **match the schema of the collection**
 # otherwise Milvus will raise exception.
 class Milvus:
-    def __init__(self, name: str = 'Milvus_server', **kwargs: dict):
+    def __init__(self, name: str = 'Milvus_server', flush_threshold: int = 80, **kwargs: dict):
         """
         :param name: 设置默认的Milvus服务器的存储位置。如果不设置，则默认会存储到 %APPDATA%/milvus-io/milvus-server 路径下
         :param kwargs:refresh 决定是否启动前先删除原有的数据
         """
+        self._flush_threshold = flush_threshold
+        self._new_added = 0
+        self._kwargs = {'refresh': False}
+        self._kwargs.update(kwargs)
         self._server_start(name)
-        self._kwargs = {'refresh': False}.update(kwargs)  # 2023-7-31 :增加refresh参数，决定是否启动前先删除原有的数据
         self._base_config_set(**kwargs)
         self.collection = self._create_collection()
         self.list_collections()
@@ -98,8 +99,7 @@ class Milvus:
             "anns_field": self._embedding_field_param['name'],
             "limit": self._top_k,
             "output_fields": [self._id_field_param['name'],
-                              self._name_field_param[
-                                  'name']]}  # note: search doesn't support vector field as output_fields
+                              self._name_field_param['name']]}  # search doesn't support vector field as output_fields
 
     @property
     def milvus_params(self) -> dict:
@@ -117,14 +117,17 @@ class Milvus:
         return params
 
     # 2023-7-31 base_dir* new: 指定文件路径
-    def _server_start(self, base_dir: Path = Path(__file__).absolute().parent.joinpath('test_milvus')):
-        default_server.set_base_dir(base_dir.as_posix())
+    def _server_start(self, name: str = 'test_milvus'):
+        # 路径仍然是无效的，需要在内部修改代码
+        base_dir: Path = Path(__file__).absolute().parent.joinpath(name)
+        self._milvus_server = MilvusServer(wait_for_started=False)
+        self._milvus_server.set_base_dir(base_dir.as_posix())
         if self._kwargs['refresh']:  # 2023-7-31 new: 取消清除之前的数据，不需要每次都build index,collections
-            default_server.cleanup()
-        default_server.start()
-        print(f"Milvus server is running on {default_server.server_address}")
+            self._milvus_server.cleanup()
+        self._milvus_server.start()
+        print(f"Milvus server is running on {self._milvus_server.server_address}")
         print(f"\nCreate connection...")
-        connections.connect(host='127.0.0.1', port=default_server.listen_port)
+        connections.connect(host='127.0.0.1', port=self._milvus_server.listen_port, timeout=60)
         print(f"\nList connections:")
         print(connections.list_connections())
 
@@ -157,29 +160,35 @@ class Milvus:
     def _check_data(data: list[ndarray, ndarray, ndarray]) -> list:
         ids, names, normed_embeddings = data
         # 不可以有缺失值
-        if not (ids.all() and names.all() and normed_embeddings.all()):
-            raise ValueError('data cannot be None')
+        if (ids == '').any() or (names == '').any() or (normed_embeddings == np.NAN).any():
+            raise ValueError('data cannot be ""or NAN')
         # 条目数必须相同
-        if not (len(ids) == len(names) == len(normed_embeddings)):
+        if not (ids.shape[0]) == names.shape[0] == normed_embeddings.shape[0]:
             raise ValueError('data is not same length')
         # id必须是int64
-        if not ids.dtype == np.int64:
-            ids.astype(np.int64)
+        if ids.dtype != np.int64:
+            ids = ids.astype(np.int64)
         # id 必须唯一
-        if ids.unique().shape[0] != ids.shape[0]:
+        if np.unique(ids).shape[0] != ids.shape[0]:
             raise ShapeError('ids must be unique')
         # name必须是str
-        if not names.dtype == np.str:
-            names.astype(np.str)
+        if names.dtype != str:  # np.str: deprecated
+            names = names.astype(str)
         # normed_embeddings必须是float32
-        if not normed_embeddings.dtype == np.float32:
-            normed_embeddings.astype(np.float32)
+        if normed_embeddings.dtype != np.float32:
+            normed_embeddings = normed_embeddings.astype(np.float32)
         # normed_embeddings必须是512维
-        if not normed_embeddings.shape[1] == 512:
+        if normed_embeddings.shape[1] != 512:
             raise ShapeError('normed_embeddings must be 512 dim')
+        # normed_embeddings必须是 单位向量
+        norms_after_normalization = np.linalg.norm(normed_embeddings, axis=1)
+        is_normalized = np.allclose(norms_after_normalization, 1)
+        if not is_normalized:
+            raise ValueError('normed_embeddings must be normalized')
         # name长度不能超过50
         if not all([len(name) <= 50 for name in names]):
             raise ValueError('name length must be less than 50')
+
         # 提取成列表
         entries = [[_id for _id in ids],
                    [name for name in names],
@@ -193,19 +202,38 @@ class Milvus:
         :param entities: [[id:int64],[name:str,len<50],[normed_embedding:float32,shape(512,)]]
         :return:
         """
+        # print 当前collection的数据量
+        print(f"\nbefore_inserting,Collection:[{self._collection_name}] has {self.collection.num_entities} entities.")
+
         print("\nEntities check...")
         entities = self._check_data(entities)
         print("\nInsert data...")
         self.collection.insert(entities)
-        # Call the flush API to make inserted data immediately available for search
-        self.collection.flush()  # 新插入的数据会自动构建index
-        print(f"Done inserting new {len(entities)}data.")
+
+        print(f"Done inserting new {len(entities[0])}data.")
         if not self.collection.has_index():  # 如果没有index，手动创建
+            # Call the flush API to make inserted data immediately available for search
+            self.collection.flush()  # 新插入的数据在segment中达到一定阈值会自动构建index，持久化
             print("\nCreate index...")
             self._create_index()
-        # 将collection 加载到到内存中
-        self.collection.load()
-        utility.wait_for_loading_complete(self._collection_name, timeout=10)
+            # 将collection 加载到到内存中
+            print("\nLoad collection to memory...")
+            self.collection.load()
+            utility.wait_for_loading_complete(self._collection_name, timeout=10)
+        else:
+            # 由于没有主动调用flush, 只有达到一定阈值才会持久化 新插入的数据
+            # 达到阈值后，会自动构建index，持久化，持久化后的新数据，才能正常的被加载到内存中，可以查找
+            # 异步的方式加载数据到内存中，避免卡顿
+            # 从而实现动态 一边查询，一边插入
+            self._new_added += 1
+            if self._new_added >= self._flush_threshold:
+                print("\nFlush...")
+                self.collection.flush()
+                self._new_added = 0
+                self.collection.load(_async=True)
+
+        # print 当前collection的数据量
+        print(f"after_inserting,Collection:[{self._collection_name}] has {self.collection.num_entities} entities.")
 
     # 向集合中插入实体
     def insert_from_files(self, file_paths: list):  ### failed
@@ -272,6 +300,9 @@ class Milvus:
     # 删除集合中的所有实体,并且关闭服务器
     # question: 可以不删除吗？下次直接读取上一次的内容？
     def shut_down(self):
+        # 将仍未 持久化的数据持久化
+        print(f"\nFlushing to seal the segment ...")
+        self.collection.flush()
         # 释放内存
         self.collection.release()
         print(f"\nReleased collection : {self._collection_name} successfully !")
@@ -279,7 +310,7 @@ class Milvus:
         # print(f"Drop index: {self._collection_name} successfully !")
         # self.collection.drop()
         # print(f"Drop collection: {self._collection_name} successfully !")
-        default_server.stop()
+        self._milvus_server.stop()
         print(f"Stop Milvus server successfully !")
 
     def has_collection(self):

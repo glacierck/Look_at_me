@@ -28,7 +28,12 @@ The code of InsightFace Python Library is released under the MIT License. There 
 ## Project finishing log 📝
 ### 2023-8-1
 ### tasks
-1. test the new milvus server 
+1. test the new milvus server ✅
+   1. refresh start
+   2. no refresh start
+   3. insert entries while searching 
+2. sqlite connect with metabase ✅ ->docker_starter
+3. flask log page
 
 
 

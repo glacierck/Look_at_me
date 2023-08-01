@@ -1,8 +1,9 @@
 import numpy as np
 from numpy.linalg import norm as l2norm
 
-
 # from easydict import EasyDict
+__all__ = ['Face']
+
 
 class Face(dict):
     def __init__(self, d=None, **kwargs):
@@ -49,11 +50,10 @@ class Face(dict):
             return None
         return self.embedding / self.embedding_norm
 
-
-
     @property
     def face_location(self):
         return self.bbox if self.bbox else None
+
     @property
     def sex(self):
         if self.gender is None:

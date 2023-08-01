@@ -1,6 +1,6 @@
 from threading import Thread
 from queue import Queue
-from my_insightface.insightface.app.real_time_tracker import MultiThreadFaceAnalysis,COST_TIME
+from real_time_tracker import MultiThreadFaceAnalysis, COST_TIME
 
 video_2_detect_queue = Queue(maxsize=400)
 detect_2_rec_queue = Queue(maxsize=200)
@@ -34,6 +34,7 @@ def main():
     finally:
         print('ave_fps = ', test.show_times / COST_TIME['image_show'][0])
         test.test_stop()
+
 
 if __name__ == '__main__':
     main()

@@ -17,7 +17,7 @@ import cv2
 from ..data import LightImage
 from timeit import default_timer as current_time
 import functools
-from milvus_standalone import MatchInfo
+from database import MatchInfo
 from scipy.optimize import linear_sum_assignment
 
 COST_TIME = {}
