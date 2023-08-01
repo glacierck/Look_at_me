@@ -1,6 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required
-from pyrfc3339 import generate
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
@@ -120,10 +119,7 @@ def auth_signin_basic():
     return render_template('pages/authentication/auth-signin-basic.html')
 
 
-@pages.route('/authentication/auth-signin-cover')
-@login_required
-def auth_signin_cover():
-    return render_template('pages/authentication/auth-signin-cover.html')
+
 
 
 @pages.route('/authentication/auth-signup-basic')
@@ -131,7 +127,7 @@ def auth_signin_cover():
 def auth_signup_basic():
     return render_template('pages/authentication/auth-signup-basic.html')
 
-
+# marked
 @pages.route('/authentication/auth-signup-cover')
 @login_required
 def auth_signup_cover():
@@ -145,7 +141,6 @@ def auth_pass_reset_basic():
 
 
 @pages.route('/authentication/auth-pass-reset-cover')
-@login_required
 def auth_pass_reset_cover():
     return render_template('pages/authentication/auth-pass-reset-cover.html')
 
@@ -241,10 +236,13 @@ def auth_offline():
 
 
 # Actual Auth pages(working)
+# @pages.route('/account/login')
+# def login():
+#     return render_template('pages/account/login.html')
 @pages.route('/account/login')
-def login():
-    return render_template('pages/account/login.html')
-
+# @login_required
+def auth_signin_cover():
+    return render_template('pages/authentication/auth-signin-cover.html')
 
 @pages.route('/account/login', methods=['POST'])
 def login_post():
@@ -258,7 +256,7 @@ def login_post():
 
         if not user or not check_password_hash(user.password, password):
             flash("Invalid Credentials")
-            return redirect(url_for('pages.login'))
+            return redirect(url_for('pages.auth_signin_cover'))
 
         login_user(user, remember=remember)
         return redirect(url_for('dashboards.index'))

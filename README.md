@@ -34,7 +34,7 @@ The code of InsightFace Python Library is released under the MIT License. There 
    3. insert entries while searching 
 2. sqlite connect with metabase ✅ ->docker_starter
 3. flask log page
-
+4. sqlite design
 
 
 ## 2023-7-31

@@ -14,9 +14,10 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     login_manager = LoginManager(app)
-    login_manager.login_view = 'pages.login'
-    db.init_app(app)
+    login_manager.login_view = 'pages.auth_signin_cover'  # set the login view
 
+    db.init_app(app)
+    print('db created')
     from .models import User
     with app.app_context():
         db.create_all()
