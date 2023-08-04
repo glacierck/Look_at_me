@@ -5,6 +5,18 @@ apps = Blueprint('apps', __name__, template_folder='templates',
                  static_folder='static', )
 
 
+
+@apps.route('/apps/email/email_basic')
+@login_required
+def email_basic():
+    return render_template('apps/email/apps-email_basic.html')
+
+
+
+
+
+
+
 # calendar
 @apps.route('/apps/calendar')
 @login_required
@@ -46,10 +58,7 @@ def mailbox():
     return render_template('apps/email/apps-mailbox.html')
 
 
-@apps.route('/apps/email/email_basic')
-@login_required
-def email_basic():
-    return render_template('apps/email/apps-email_basic.html')
+
 
 
 @apps.route('/apps/email/email_ecommerce')

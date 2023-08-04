@@ -7,11 +7,12 @@ from web.velzon.models import User
 
 
 class LoginForm(FlaskForm):
+    # form的label与<input>的name属性值相同
     email = StringField('Email', validators=[DataRequired(), Length(1, 64),
                                              Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    remember_me = BooleanField('Keep me logged in')
-    submit = SubmitField('Log In')
+    remember_me = BooleanField('Remember')
+    submit = SubmitField('Login In')
 
 
 class RegistrationForm(FlaskForm):
@@ -24,11 +25,11 @@ class RegistrationForm(FlaskForm):
                'underscores')])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Register')
-
-    def validate_email(self, field):
+    @staticmethod
+    def validate_email(field):
         if User.query.filter_by(email=field.data.lower()).first():
             raise ValidationError('Email already registered.')
-
-    def validate_username(self, field):
+    @staticmethod
+    def validate_username(field):
         if User.query.filter_by(username=field.data).first():
             raise ValidationError('Username already in use.')

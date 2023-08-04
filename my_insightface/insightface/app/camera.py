@@ -3,8 +3,6 @@ import subprocess
 from pathlib import Path
 
 import cv2
-
-from .multi_thread_analysis import threads_done
 from ..data import LightImage
 
 
@@ -30,7 +28,9 @@ class Camera:
                 self._url = 1
             case ['mp4', _]:
                 video_dir = Path(__file__).absolute().parents[
-                                2] / f'database\\milvus_standalone\\data\\{self._test_folder}\\video'
+                                3] / f'database\\milvus_standalone\\data\\{self._test_folder}\\video'
+                if not video_dir.exists() and not video_dir.is_dir():
+                    raise FileNotFoundError(f'video_dir = {video_dir}')
                 video_path = list(video_dir.glob('*.mp4'))[0]
                 assert video_path.exists() and video_path.is_file(), f'video_path = {video_path}'
                 self._url = video_path.as_posix()
@@ -81,6 +81,7 @@ class Camera:
                        'resolution': self._resolution, 'url': self._url}
 
     def read_video(self, results: queue.Queue):
+        from .multi_thread_analysis import threads_done
         print('camera_read start')
         try:
             while not threads_done.is_set():

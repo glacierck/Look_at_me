@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required
 
-from .apps.auth.forms import LoginForm
+from .apps.auth.forms import LoginForm, RegistrationForm
+from .apps.email import send_email
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
@@ -174,10 +175,7 @@ def auth_success_msg_basic():
     return render_template('pages/authentication/auth-success-msg-basic.html')
 
 
-@pages.route('/authentication/auth-success-msg-cover')
-@login_required
-def auth_success_msg_cover():
-    return render_template('pages/authentication/auth-success-msg-cover.html')
+
 
 
 @pages.route('/authentication/auth-twostep-basic')
@@ -255,17 +253,17 @@ def login():
         user = User.query.filter_by(email=form.email.data.lower()).first()
         if user is not None and user.verify_password(form.password.data):
             login_user(user, form.remember_me.data)
-            next = request.args.get('next')
-            if next is None or not next.startswith('/'):
-                next = url_for('dashboards.index')
-            return redirect(next)
+            _next = request.args.get('next')
+            if _next is None or not _next.startswith('/'):
+                _next = url_for('dashboards.index')
+            return redirect(_next)
         flash('Invalid email or password.')
     return render_template('pages/authentication/auth-signin-cover.html', form=form)
 
 
-@pages.route('/account/signup')
-def signup():
-    return render_template('pages/account/signup.html')
+# @pages.route('/account/signup')
+# def signup():
+#     return render_template('pages/account/signup.html')
 
 
 # @pages.route('/account/signup', methods=['POST'])
@@ -290,43 +288,40 @@ def signup():
 #
 #     return redirect(url_for('pages.login'))
 # marked
-@pages.route('/authentication/auth-signup-cover',methods =['POST','GET'])
+# ------------------------------register------------------------------------------
+
+# needed to modify
+# page of email has been sent
+@pages.route('/authentication/wait-for-confirmation')
+def wait_for_confirmation():
+    return render_template('pages/authentication/auth-wait-email-confirmation.html')
+
+# success page after email confirmation
+@pages.route('/authentication/success')
+def auth_success_msg_cover():
+    return render_template('pages/authentication/auth-success-msg-cover.html')
+
+
+# page of registration
+@pages.route('/authentication/auth-signup-cover', methods=['POST', 'GET'])
 def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(email=form.email.data.lower(),
+                    username=form.username.data,
+                    password=form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        token = user.generate_confirmation_token()
+        send_email(user.email, 'Confirm Your Account',
+                   'auth/email_confirmation', user=user, token=token)
+        flash('A confirmation email has been sent to you by email.')
+        return redirect(url_for('page.wait_for_confirmation'))
+    return render_template('pages/authentication/auth-signup-cover.html',form=form)
 
 
 
-
-
-
-
-
-    return render_template('pages/authentication/auth-signup-cover.html')
-
-
-
-@pages.route('/account/signup', methods=['POST'])
-def signup_post():
-    email = request.form.get('email')
-    username = request.form.get('username')
-    password = request.form.get('password')
-
-    user_email = User.query.filter_by(email=email).first()
-    user_username = User.query.filter_by(username=username).first()
-
-    if user_email:
-        flash("User email already Exists")
-        return redirect(url_for('pages.signup'))
-    if user_username:
-        flash("Username already Exists")
-        return redirect(url_for('pages.signup'))
-
-    new_user = User(email=email, username=username, password=generate_password_hash(password, method="sha256"))
-    db.session.add(new_user)
-    db.session.commit()
-
-    return redirect(url_for('pages.login'))
-
-
+# -----------------------------logout-------------------------------------
 @pages.route('/authentication/auth-logout-cover')
 @login_required
 def auth_logout_cover():

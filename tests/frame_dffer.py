@@ -1,3 +1,6 @@
+import time
+import timeit
+
 import cv2
 import numpy as np
 
@@ -7,13 +10,18 @@ from my_insightface.insightface.app.camera import Camera
 """
 帧差法，背景减除法几个不同的模型，计算效率在500万像素下cpu负荷较高，实时率差
 """
+
+
 def frame_diff(limit_frames: int):
-    cap = Camera('auto_focus', 'usb', resolution=(2592, 1944), fps=30).videoCapture
+    cap = Camera('mp4', resolution=(2592, 1944), fps=30,test_folder='test_03').videoCapture
     start_time = cv2.getTickCount()
     _, frame1 = cap.read()
     _, frame2 = cap.read()
     frames = 0
+    start = 0
+    end = 0
     while frames < limit_frames:
+        start = timeit.default_timer()
         _, frame3 = cap.read()
         if not _:
             break
@@ -41,6 +49,10 @@ def frame_diff(limit_frames: int):
         frames += 1
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+        end = timeit.default_timer()
+        sleep_time = 1 / 50 - (end - start)
+        if sleep_time > 0:
+            time.sleep(sleep_time)
     end_time = cv2.getTickCount()
     print(f"measured FPS of the video is {frames / ((end_time - start_time) / cv2.getTickFrequency())}")
     cap.release()
