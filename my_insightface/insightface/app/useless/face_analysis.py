@@ -16,11 +16,11 @@ import numpy as np
 import onnxruntime
 
 from milvus_standalone.common import MatchInfo
-from ..app.common import Face
-from ..model_zoo import model_zoo
-from ..utils import ensure_available
+from my_insightface.insightface.app.common import Face
+from my_insightface.insightface.model_zoo import model_zoo
+from my_insightface.insightface.utils import ensure_available
 from milvus_standalone.milvus_lite import Milvus
-from ..data.image import Image
+from my_insightface.insightface.data.image import Image
 
 __all__ = ['FaceAnalysis','Milvus2Search']
 

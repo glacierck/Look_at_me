@@ -41,7 +41,7 @@ from sympy import ShapeError
 # Data type of the data to insert must **match the schema of the collection**
 # otherwise Milvus will raise exception.
 class Milvus:
-    def __init__(self, name: str = 'Milvus_server', flush_threshold: int = 80, **kwargs: dict):
+    def __init__(self, flush_threshold: int,name: str = 'Milvus_server',**kwargs: dict):
         """
         :param name: 设置默认的Milvus服务器的存储位置。如果不设置，则默认会存储到 %APPDATA%/milvus-io/milvus-server 路径下
         :param kwargs:refresh 决定是否启动前先删除原有的数据

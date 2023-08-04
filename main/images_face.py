@@ -4,7 +4,7 @@ import functools
 import logging
 import pprint
 
-from my_insightface.insightface.app.face_analysis import FaceAnalysis
+from my_insightface.insightface.app.useless.face_analysis import FaceAnalysis
 from my_insightface.insightface.app.common import Face
 from typing import *
 from pathlib import Path

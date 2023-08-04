@@ -149,13 +149,13 @@ class Camera:
             # url = url + f'/video?{resolution[0]}x{resolution[1]}'
         try:
             self._video = cv2.VideoCapture(self._url)
-            # if not self._video.isOpened():
+            # if not self.videoCapture.isOpened():
             #     # 如果打开视频失败，尝试发送请求到链接
             #     response = requests.get("http://192.168.0.102:4747/override")
             #     response.raise_for_status()  # 如果响应状态码不是200，引发HTTPError异常
             #
             #     # 再次尝试打开视频
-            #     self._video = cv2.VideoCapture(str(url))
+            #     self.videoCapture = cv2.VideoCapture(str(url))
             if not self._video.isOpened():
                 raise ValueError(
                     f"Could not open video source {self._url} even after sending request to override link")

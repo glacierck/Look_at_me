@@ -8,13 +8,15 @@ db = SQLAlchemy()
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = b'_5#y2L"F4Q8z\n\xec]/'
+    app.config['WTF_CSRF_ENABLED'] = True
     app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///db.sqllite"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     login_manager = LoginManager(app)
-    login_manager.login_view = 'pages.auth_signin_cover'  # set the login view
+    login_manager.session_protection = 'strong'
+    login_manager.login_view = 'pages.login'  # set the login view
 
     db.init_app(app)
     print('db created')

@@ -8,7 +8,9 @@ from pymilvus.orm import utility
 
 from .milvus_lite import Milvus
 from .common import MatchInfo
-from my_insightface.insightface.app.real_time_tracker import Target, Detector, Extractor
+from my_insightface.insightface.app.identifier import Extractor
+from my_insightface.insightface.app.common import Target
+from my_insightface.insightface.app.detector import Detector
 from my_insightface.insightface.data.image import LightImage
 from my_insightface.insightface.utils.my_tools import get_digits, get_nodigits
 
@@ -16,7 +18,8 @@ __all__ = ['MilvusRealTime']
 
 
 class MilvusRealTime:
-    def __init__(self, test_folder: str = 'test_01', img_folder: str = 'known', refresh: bool = False):
+    def __init__(self, flush_threshold:int,test_folder: str = 'test_01', img_folder: str = 'known',
+                 refresh: bool = False):
         """
         init Milvus server
         :param test_folder:
@@ -24,7 +27,7 @@ class MilvusRealTime:
         :param refresh: if True, delete all data in milvus and re-register
         """
         self._match_threshold: float = 0.5
-        self._milvus = Milvus(refresh=refresh)
+        self._milvus = Milvus(refresh=refresh,flush_threshold=flush_threshold)
         self._image_root = Path(__file__).parent.absolute() / 'data'
         self._image_folder: Path = self._image_root / test_folder / img_folder
         self._npz_path: Path = self._image_folder / 'faces.npz'
@@ -185,4 +188,5 @@ class MilvusRealTime:
         return self._search_by_milvus(targets)
 
     def stop_milvus(self):
+
         self._milvus.shut_down()

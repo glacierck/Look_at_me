@@ -1,17 +1,14 @@
 from __future__ import annotations
 
 import functools
-import logging
 import concurrent.futures
 import time
 from threading import Thread, Event
-import pprint
 import cv2
 import numpy as np
 from multiprocessing import Queue
 from my_insightface.insightface.model_zoo.model_zoo import get_model
-from milvus_standalone.milvus_lite import Milvus
-from my_insightface.insightface.app.face_analysis import FaceAnalysis, Milvus2Search
+from my_insightface.insightface.app.useless.face_analysis import Milvus2Search
 from my_insightface.insightface.app.common import Face
 from typing import *
 from pathlib import Path

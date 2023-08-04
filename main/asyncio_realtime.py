@@ -1,6 +1,5 @@
-from asyncio import queues
 import asyncio
-from my_insightface.insightface.app.asyncio_tracker import AsyncioFaceAnalysis, COST_TIME
+from my_insightface.insightface.app.useless.asyncio_tracker import AsyncioFaceAnalysis, COST_TIME
 
 
 async def main():

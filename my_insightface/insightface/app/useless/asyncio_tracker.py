@@ -4,11 +4,14 @@ from pathlib import Path
 
 import cv2
 
-from .real_time_tracker import (Camera, Identifier, Screen,
-                                Detector, COST_TIME, current_time)
+from my_insightface.insightface.app.multi_thread_analysis import (COST_TIME, current_time)
+from my_insightface.insightface.app.screen import Screen
+from my_insightface.insightface.app.camera import Camera
+from my_insightface.insightface.app.identifier import Identifier
+from my_insightface.insightface.app.detector import Detector
 from asyncio import Queue
 
-from ..data.image import LightImage
+from my_insightface.insightface.data.image import LightImage
 
 
 def cost_time_recording(func):
@@ -24,7 +27,10 @@ def cost_time_recording(func):
 
     return wrapper
 
+"""
 
+非常卡顿
+"""
 class AsyncioFaceAnalysis:
     def __init__(self, test_folder: str):
         self.show_times = 0

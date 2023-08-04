@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required
+
+from .apps.auth.forms import LoginForm
 from .models import User
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import db
@@ -119,19 +121,10 @@ def auth_signin_basic():
     return render_template('pages/authentication/auth-signin-basic.html')
 
 
-
-
-
 @pages.route('/authentication/auth-signup-basic')
 @login_required
 def auth_signup_basic():
     return render_template('pages/authentication/auth-signup-basic.html')
-
-# marked
-@pages.route('/authentication/auth-signup-cover')
-@login_required
-def auth_signup_cover():
-    return render_template('pages/authentication/auth-signup-cover.html')
 
 
 @pages.route('/authentication/auth-pass-reset-basic')
@@ -173,12 +166,6 @@ def auth_lockscreen_cover():
 @login_required
 def auth_logout_basic():
     return render_template('pages/authentication/auth-logout-basic.html')
-
-
-@pages.route('/authentication/auth-logout-cover')
-@login_required
-def auth_logout_cover():
-    return render_template('pages/authentication/auth-logout-cover.html')
 
 
 @pages.route('/authentication/auth-success-msg-basic')
@@ -239,32 +226,82 @@ def auth_offline():
 # @pages.route('/account/login')
 # def login():
 #     return render_template('pages/account/login.html')
-@pages.route('/account/login')
-# @login_required
-def auth_signin_cover():
-    return render_template('pages/authentication/auth-signin-cover.html')
+# @pages.route('/account/login')
+# # @login_required
+# def auth_signin_cover():
+#     return render_template('pages/authentication/auth-signin-cover.html')
 
-@pages.route('/account/login', methods=['POST'])
-def login_post():
-    if request.method == 'POST':
-        email = request.form.get('email')
-        password = request.form.get('password')
-        remember = True if request.form.get('remember') else False
 
-        user = User.query.filter_by(email=email).first()
-        print("sagar", user)
-
-        if not user or not check_password_hash(user.password, password):
-            flash("Invalid Credentials")
-            return redirect(url_for('pages.auth_signin_cover'))
-
-        login_user(user, remember=remember)
-        return redirect(url_for('dashboards.index'))
+# @pages.route('/account/login', methods=['POST'])
+# def login_post():
+#     if request.method == 'POST':
+#         email = request.form.get('email')
+#         password = request.form.get('password')
+#         remember = True if request.form.get('remember') else False
+#
+#         user = User.query.filter_by(email=email).first()
+#         print("sagar", user)
+#
+#         if not user or not check_password_hash(user.password, password):
+#             flash("Invalid Credentials")
+#             return redirect(url_for('pages.auth_signin_cover'))
+#
+#         login_user(user, remember=remember)
+#         return redirect(url_for('dashboards.index'))
+@pages.route('/account/login', methods=['POST', 'GET'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data.lower()).first()
+        if user is not None and user.verify_password(form.password.data):
+            login_user(user, form.remember_me.data)
+            next = request.args.get('next')
+            if next is None or not next.startswith('/'):
+                next = url_for('dashboards.index')
+            return redirect(next)
+        flash('Invalid email or password.')
+    return render_template('pages/authentication/auth-signin-cover.html', form=form)
 
 
 @pages.route('/account/signup')
 def signup():
     return render_template('pages/account/signup.html')
+
+
+# @pages.route('/account/signup', methods=['POST'])
+# def signup_post():
+#     email = request.form.get('email')
+#     username = request.form.get('username')
+#     password = request.form.get('password')
+#
+#     user_email = User.query.filter_by(email=email).first()
+#     user_username = User.query.filter_by(username=username).first()
+#
+#     if user_email:
+#         flash("User email already Exists")
+#         return redirect(url_for('pages.signup'))
+#     if user_username:
+#         flash("Username already Exists")
+#         return redirect(url_for('pages.signup'))
+#
+#     new_user = User(email=email, username=username, password=generate_password_hash(password, method="sha256"))
+#     db.session.add(new_user)
+#     db.session.commit()
+#
+#     return redirect(url_for('pages.login'))
+# marked
+@pages.route('/authentication/auth-signup-cover',methods =['POST','GET'])
+def register():
+
+
+
+
+
+
+
+
+    return render_template('pages/authentication/auth-signup-cover.html')
+
 
 
 @pages.route('/account/signup', methods=['POST'])
@@ -290,8 +327,14 @@ def signup_post():
     return redirect(url_for('pages.login'))
 
 
+@pages.route('/authentication/auth-logout-cover')
+@login_required
+def auth_logout_cover():
+    return render_template('pages/authentication/auth-logout-cover.html')
+
+
 @pages.route('/account/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('pages.login'))
+    return redirect(url_for('pages.auth-logout-cover'))
