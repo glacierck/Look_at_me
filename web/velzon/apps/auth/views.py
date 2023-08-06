@@ -68,6 +68,7 @@ def confirm(token):
         # confirm successfully
         db.session.commit()
         flash('You have confirmed your account. Thanks!')
+        login_user(user, remember=True)
         return redirect(url_for('authentication.auth_success_msg_cover'))
     else:
         # something wrong
