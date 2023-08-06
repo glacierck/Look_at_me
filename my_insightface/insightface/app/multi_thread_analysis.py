@@ -50,8 +50,9 @@ class MultiThreadFaceAnalysis:
         print('detect_thread start')
         while not threads_done.is_set():
             try:
-                detect_job = jobs.get(timeout=10)
                 # print('image2detect.qsize() = ', jobs.qsize())
+                detect_job = jobs.get(timeout=10)
+
             except queue.Empty:
                 print('detect_thread,queue.Empty')
                 break
@@ -63,10 +64,12 @@ class MultiThreadFaceAnalysis:
         print('detect2identify start')
         while not threads_done.is_set():
             try:
+                # print(f'detect2identify.qsize() = {jobs.qsize()}')
                 to_update = jobs.get(timeout=10)
+
                 ide_res = self._identifier.identified_results(to_update)
                 results.put(ide_res)
-                # print(f'detect2identify.qsize() = {jobs.qsize()}')
+
             except queue.Empty:
                 print('detect2identify is empty')
                 break
@@ -84,23 +87,23 @@ class MultiThreadFaceAnalysis:
                 threads_done.set()
                 break
             try:
-
+                # print(f'finally_show_queue.qsize() = {jobs.qsize()}')
                 to_update = jobs.get(timeout=15)
                 if fps_end != 0:
                     cv2.putText(to_update.nd_arr, f'fps = {1 / (fps_end - fps_start):.2f}',
                                 (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                 fps_start = current_time()
-                # self._screen.show(to_update)
-                draw_bbox(to_update)
+                self._screen.show(to_update)
+                # draw_bbox(to_update)
                 self.show_times += 1
                 end_time = current_time()
                 sleep_time = 1 / 30 - (end_time - start) if (end_time - start) < 1 / 30 else 0
                 if sleep_time == 0:
                     print(f'Warning: sleep_time = {sleep_time}')
-                sleep(sleep_time)
+                # sleep(sleep_time)
                 fps_end = current_time()
 
-                # print(f'finally_show_queue.qsize() = {jobs.qsize()}')
+
 
             except queue.Empty:
                 print('finally_show_queue is empty')
@@ -109,5 +112,3 @@ class MultiThreadFaceAnalysis:
     def test_stop(self):
         self._identifier.stop_milvus()
         print('test_of_face_analysis ends!')
-
-

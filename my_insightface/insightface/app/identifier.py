@@ -71,10 +71,10 @@ class Identifier:
         self._update(image2identify)
         self._extract(image2identify)
         # test 模拟搜索时候插入新的 可以慢速的插入，不影响平均fps
-        if (self._frame_cnt % 6 == 0 and len(self._test_ids)
-                and len(self._test_embeddings) and len(self._test_names)):
-            self._milvus.add_new_face(self._test_ids.pop(), self._test_names.pop(),
-                                      self._test_embeddings.pop())
+        # if (self._frame_cnt % 600 == 0 and len(self._test_ids)
+        #         and len(self._test_embeddings) and len(self._test_names)):
+        #     self._milvus.add_new_face(self._test_ids.pop(), self._test_names.pop(),
+        #                               self._test_embeddings.pop())
         self._search()
         image2identify.faces.clear()
         for i, target in enumerate(self._targets.values()):

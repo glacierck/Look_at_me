@@ -1,0 +1,17 @@
+🙋🏻‍♀️️Hey {{user.username}} ! 🙋🏻‍♂️
+
+💓 Let's ✅ your email ! 💌
+
+🤷‍♀️Yep, we know...🤷‍♂️
+
+🙄 Just 1️⃣ more step to verify your account! 👏🏻
+
+✨Press to kick-start 👇🏻👇🏻👇🏻 your awesome journey! 🎉    
+
+{{ url_for('authentication.confirm',token=token,_external=True) }}
+
+Need Help ? 🙏 We're here for you 🙌🏻
+
+Please send and feedback or bug info to zhouge1831@gmail.com
+
+2023 Velzon. Design & Develop by 😱 Atticus.Zhou 😎

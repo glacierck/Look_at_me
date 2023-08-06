@@ -1,9 +1,10 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, Length, Email, Regexp, EqualTo
+from wtforms.validators import DataRequired, Length, Email, Regexp
 from wtforms import ValidationError
+from . import User
 
-from web.velzon.models import User
+__all__ = ['LoginForm', 'RegistrationForm']
 
 
 class LoginForm(FlaskForm):
@@ -25,11 +26,13 @@ class RegistrationForm(FlaskForm):
                'underscores')])
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Register')
-    @staticmethod
-    def validate_email(field):
+
+    def validate_email(self, field):
         if User.query.filter_by(email=field.data.lower()).first():
+            temp = User.query.filter_by(email=field.data.lower()).first()
             raise ValidationError('Email already registered.')
-    @staticmethod
-    def validate_username(field):
+
+    def validate_username(self, field):
         if User.query.filter_by(username=field.data).first():
+            temp = User.query.filter_by(username=field.data).first()
             raise ValidationError('Username already in use.')
