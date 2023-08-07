@@ -37,8 +37,6 @@ class Detector:
                           'det_thresh': 0.5,
                           'input_size': (320, 320)}
         self.detector_model.prepare(**prepare_params)
-        self._frame_count = 0
-        self._trackers = []
 
     def __call__(self, img2detect: LightImage) -> LightImage:
         detect_params = {'max_num': 0, 'metric': 'default'}

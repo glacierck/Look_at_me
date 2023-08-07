@@ -13,8 +13,9 @@ def whole_fps_test(resolution: tuple[int, int], fps: int) -> tuple[tuple[str], t
     # auto_focus,manual_focus
     camera_params = {'app': 'auto_focus', 'approach': 'usb',
                      'fps': fps, 'resolution': resolution}
+    identifier_params = {'server_refresh': False, 'npz_refresh': False}
     test = MultiThreadFaceAnalysis(test_folder='test_02',
-                                   camera_params=camera_params, identifier_params={'flush_threshold': 1000})
+                                   camera_params=camera_params, identifier_params=identifier_params)
     try:
         video_read_thread = Thread(target=test.video_read, args=(video_2_detect_queue,))
         detect_thread = Thread(target=test.image2detect,

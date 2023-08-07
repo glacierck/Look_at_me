@@ -1,0 +1,19 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Flask-velzon" type="Python.FlaskServer">
+    <option name="flaskDebug" value="true" />
+    <module name="Look_at_me" />
+    <option name="target" value="D:\Users\Administrator\OneDrive\CXXY\Competition\DC\FR_pj\Look_at_me\web\velzon\flasky.py" />
+    <option name="targetType" value="PATH" />
+    <option name="INTERPRETER_OPTIONS" value="" />
+    <option name="PARENT_ENVS" value="true" />
+    <option name="SDK_HOME" value="D:\ProgramData\anaconda3\envs\Integrated\python.exe" />
+    <option name="SDK_NAME" value="Integrated" />
+    <option name="WORKING_DIRECTORY" value="" />
+    <option name="IS_MODULE_SDK" value="false" />
+    <option name="ADD_CONTENT_ROOTS" value="true" />
+    <option name="ADD_SOURCE_ROOTS" value="true" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+    <option name="launchJavascriptDebuger" value="false" />
+    <method v="2" />
+  </configuration>
+</component>
