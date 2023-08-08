@@ -1,11 +1,6 @@
-import sys
-from pathlib import Path
-
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, current_app
 from flask_login import login_user, logout_user, login_required
-from wtforms import ValidationError
-
-from ..auth.forms import LoginForm, RegistrationForm
+from ..auth.forms import LoginForm, RegistrationForm, ResendEmailForm
 from ..models import User
 from .. import db
 
@@ -21,22 +16,20 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data.lower()).first()
         # only allow login if the user is confirmed and the password is correct
-        if user is not None and user.verify_password(form.password.data):
+        if user is None:
+            flash(f"Invalid User: '{form.email.data}'!")
+        elif not user.verify_password(form.password.data):
+            flash(f'Invalid password: {form.password.data}!')
+        else:
             login_user(user, form.remember_me.data)
             _next = request.args.get('next')
             if _next is None or not _next.startswith('/'):
                 _next = url_for('dashboards.index')
             return redirect(_next)
-        flash('Invalid email or password.')
     return render_template('authentication/auth-signin-cover.html', form=form)
 
 
 # ------------------------------register------------------------------------------
-
-
-@authentication.route('/_404_alt')
-def _404_alt():
-    return render_template('authentication/auth-404-alt.html')
 
 
 # success page after email confirmation
@@ -58,7 +51,7 @@ def confirm(token):
     if user is None:
         # Invalid token
         flash('Invalid or expired token.')
-        return redirect(url_for('authentication._404_alt'))
+        abort(404)
     elif user.confirmed:
         # Already confirmed
         return redirect(url_for('dashboards.index'))
@@ -69,8 +62,7 @@ def confirm(token):
         login_user(user, remember=True)
         return redirect(url_for('authentication.auth_success_msg_cover'))
     else:
-        # something wrong
-        return redirect(url_for('authentication._404_alt'))
+        abort(404)
 
 
 # page of registration
@@ -86,8 +78,8 @@ def wait_for_confirmation(token):
     # html 的form中的action意味着提交表单提交到哪个页面
     user = User.get_user_from_token(token)
     assert user is not None, "user from get_user_from_token(token) is None"
-    resend_form = RegistrationForm()
-    if resend_form.is_submitted():
+    resend_form = ResendEmailForm()
+    if resend_form.validate_on_submit():
         if user.email != resend_form.email.data.lower():
             user.email = resend_form.email.data.lower()
             db.session.commit()
@@ -103,7 +95,6 @@ def wait_for_confirmation(token):
 def register():
     from ..email import send_email
     register_form = RegistrationForm()
-    # print(1,file=sys.stderr)
     # resister_form.validate_on_submit() 会调用 is_submitted 和 validate_*** 函数
     if register_form.validate_on_submit():
         # unique email and username
@@ -113,7 +104,7 @@ def register():
         if not user and not user_2:
             user = User(email=register_form.email.data.lower(),
                         username=register_form.username.data,
-                        password=register_form.password.data)
+                        password=register_form.password.data,)
             db.session.add(user)
             db.session.commit()
         token = user.generate_confirmation_token()
@@ -122,8 +113,8 @@ def register():
                    'auth/email-to-verify', user=user, token=token)
         # flash('A confirmation email has been sent to you by email.')
         return redirect(url_for('authentication.wait_for_confirmation', token=token))
-    elif register_form.email.data or register_form.username.data:
-        flash('Email or username has been registered.')
+    elif register_form.email.data and register_form.username.data:
+        flash('Email or username has been registered !')
     return render_template('authentication/auth-signup-cover.html', form=register_form)
 
 

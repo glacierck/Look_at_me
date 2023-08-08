@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% for error in form.email.errors %}
+<!-- Danger Alert -->
+    <div class="alert alert-danger alert-border-left alert-dismissible fade show" role="alert">
+        <i class="ri-error-warning-line me-3 align-middle"></i> <strong>Somthing is Wrong!</strong> {{ error }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {#                                                        <div class="alert alert-danger">{{ error }}</div>#}
+{% endfor %}
+</body>
+</html>
+
+{% with messages = get_flashed_messages() %}
+{% if messages and form.data %}
+    {% for message in messages %}
+    <!-- Warning Alert -->
+        <div class="alert alert-warning alert-border-left alert-dismissible fade show" role="alert">
+            <i class="ri-alert-line me-3 align-middle"></i> <strong>Warning</strong> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}

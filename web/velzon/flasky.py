@@ -1,11 +1,11 @@
 from apps import create_app
-# from .apps.email import Mailer
 
-app = create_app()
-# mailer = Mailer(app)if
-if __name__ == '__main__':
+
+def main():
+    app = create_app()
+
     app.run(debug=True)
 
 
-
-
+if __name__ == '__main__':
+    main()

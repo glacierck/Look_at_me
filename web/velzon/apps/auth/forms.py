@@ -8,23 +8,25 @@ __all__ = ['LoginForm', 'RegistrationForm']
 
 
 class LoginForm(FlaskForm):
-    # form的label与<input>的name属性值相同
-    email = StringField('Email', validators=[DataRequired(), Length(1, 64),
-                                             Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
+    # form的字段名与<input>的name属性值相同
+    # validators 是一些验证条件，DataRequired-》必填
+    email = StringField('Email', default="User@example.com", validators=[DataRequired(), Length(1, 64),
+                                                                         Email()])
+    password = PasswordField('Password', default="", validators=[DataRequired()])
     remember_me = BooleanField('Remember')
     submit = SubmitField('Login In')
 
 
 class RegistrationForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Length(1, 64),
-                                             Email()])
-    username = StringField('Username', validators=[
+    email = StringField('Email', default="User@example.com", validators=[DataRequired(), Length(1, 64),
+                                                                         Email()])
+    # Regexp 正则表达式验证
+    username = StringField('Username', default="", validators=[
         DataRequired(), Length(1, 64),
         Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
                'Usernames must have only letters, numbers, dots or '
                'underscores')])
-    password = PasswordField('Password', validators=[DataRequired()])
+    password = PasswordField('Password', default="", validators=[DataRequired()])
     submit = SubmitField('Register')
 
     def validate_email(self, field):
@@ -36,3 +38,15 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(username=field.data).first()
         if user and user.confirmed:
             raise ValidationError('Username already in use.')
+
+
+class ResendEmailForm(FlaskForm):
+    email = StringField('Email', default="", validators=[DataRequired(), Length(1, 64),
+                                                         Email()])
+    submit = SubmitField('Register')
+
+    def validate_email(self, field):
+        user = User.query.filter_by(email=field.data.lower()).first()
+        # you can not send email of verification to the Exited account whatever
+        if user and user.confirmed:
+            raise ValidationError('Email already registered.')
