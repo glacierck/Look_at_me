@@ -1,59 +1,104 @@
 import json
-from random import choice
+import pprint
+import random
+
+from sqlalchemy import and_, not_
 
 from . import db
-from .models import Role, User, user2leader_map
+from .models import Role, User
 
-# 定义10个用户的电子邮件和用户名
-users_data = [
-    {'email': f'user{i}@example.com', 'username': f'User{i}', 'password': 'password'}
-    for i in range(5)
-]
+# 预定义一些可能的学科
+subjects = ['ME', 'CS', 'EE']
 
 
-def init_test_data():
-    new_test_user()
-    add_leader()
+def generate_predefined_users(num_students: int = 50, num_counselors: int = 50, num_admins: int = 1):
+    _predefined_users = []
+
+    # 生成学生
+    for _ in range(num_students):
+        subject = random.choice(subjects)
+        roll = str(random.randint(10, 30))
+        class_number = str(random.randint(1, 8)).zfill(1)
+        student_number = str(random.randint(1, num_students)).zfill(2)
+        username = f"{subject}{roll}{class_number}{student_number}"
+        _predefined_users.append({'username': username, 'role': 'Student'})
+    assert 1 <= num_counselors <= 99, "Number of counselors should be between 1 and 99!"
+    # 生成领导者
+    for _ in range(num_counselors):
+        subject = random.choice(subjects)
+        roll = str(random.randint(10, 30))
+        counselor_number = str(random.randint(1, num_counselors)).zfill(2)
+        username = f"{subject}{roll}X{counselor_number}"
+        _predefined_users.append({'username': username, 'role': 'Counselor'})
+    assert num_admins == 1, "Only one administrator is allowed!"
+    # 生成管理员
+    for _ in range(num_admins):
+        username = "admin00X00"
+        _predefined_users.append({'username': username, 'role': 'Administrator'})
+
+    return _predefined_users
+
+
+
+
+if __name__ == '__main__':
+    # 调用函数生成预定义的用户
+    predefined_users = generate_predefined_users()
+    pprint.pprint(predefined_users)
+
+
+def init_test_data(init_db: bool = False):
+    # 调用函数生成预定义的用户
+    if init_db:
+        predefined_users = generate_predefined_users()
+        create_predefined_users(predefined_users)
+        create_relationship()
     # 调用该函数将用户信息导出为JSON
     export_users_to_json()
     print("Test data initialized successfully!")
 
 
-def new_test_user():
-    from random import choice
+def create_predefined_users(_predefined_users):
 
-    # 随机选择角色名
-    role_names = ['Student', 'Counselor', 'Administrator']
     # 创建用户
-    for user_data in users_data:
-        existing_user = User.query.filter_by(email=user_data['email']).first()
+    for user_info in _predefined_users:
+        existing_user = User.query.filter_by(username=user_info['username']).first()
         if existing_user is not None:
             continue
-        role_name = choice(role_names)
-        role = Role.query.filter_by(name=role_name).first()
-        user = User(email=user_data['email'],
-                    username=user_data['username'],
-                    role=[role])  # 设置角色
-        user.password = user_data['password']
+        role = Role.query.filter_by(name=user_info['role']).first()
+
+        user = User(username=user_info['username'],
+                    roles=[role])  # 设置角色
         db.session.add(user)
     # 保存更改
     db.session.commit()
-    print("Users created successfully!")
+    print("predefined Users created successfully!")
 
 
-def add_leader():
-    # 随机选择用户作为领导人
-    leaders = User.query.all()
+def create_relationship():
+    # 所有用户除了admin自己都要被他领导
+    users = User.query.filter(User.username != 'admin00X00').all()
+    admin = User.query.filter_by(username='admin00X00').first()
+    for user in users:
+        user.leaders.append(admin)
 
-    for user in users_data:
-        leader = choice(leaders)
-        user_record = User.query.filter_by(email=user['email']).first()
-        predefined_user2leader_mappings = [{'user_id': user_record.id, 'leader_id': leader.id}]
-        db.session.execute(user2leader_map.insert(), predefined_user2leader_mappings)
+    for subject in subjects:
+        # find leader
+        leaders = User.query.filter(User.username.like(f'{subject}__X%')).all()
+        # find students
+        students = User.query.filter(
+            and_(
+                User.username.like(f'{subject}___%'),
+                not_(User.username.like(f'{subject}__X%'))
+            )
+        ).all()
+        for student in students:
+            for leader in leaders:
+                student.leaders.append(leader)
 
     # 保存更改
     db.session.commit()
-    print("Association tables initialized successfully!")
+    print("create_relationship successfully!")
 
 
 def export_users_to_json():
@@ -67,8 +112,8 @@ def export_users_to_json():
             'id': user.id,
             'email': user.email,
             'username': user.username,
-            'role': [role.name for role in user.role],
-            'leader': [leader.username for leader in user.leader],
+            'role': [role.name for role in user.roles],
+            'leader': [leader.username for leader in user.leaders],
             'followers': [follower.username for follower in user.followers]
         }
         users_list.append(user_info)

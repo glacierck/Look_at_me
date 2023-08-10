@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, abort, current_app
 from flask_login import login_user, logout_user, login_required
 from ..auth.forms import LoginForm, RegistrationForm, ResendEmailForm
-from ..models import User
-from .. import db
+from ...models import User
+from ... import db
 
 # template_dir = Path(__file__).parent.parent / 'templates'
 
@@ -13,11 +13,13 @@ authentication = Blueprint('authentication', __name__, template_folder='template
 @authentication.route('/account/login', methods=['POST', 'GET'])
 def login():
     form = LoginForm()
-    if form.validate_on_submit():
+    if form.is_submitted():
         user = User.query.filter_by(email=form.email.data.lower()).first()
         # only allow login if the user is confirmed and the password is correct
         if user is None:
             flash(f"Invalid User: '{form.email.data}'!")
+        elif not user.confirmed:
+            flash(f'Please sign up to confirm your account first!')
         elif not user.verify_password(form.password.data):
             flash(f'Invalid password: {form.password.data}!')
         else:
@@ -70,7 +72,7 @@ def confirm(token):
 # page of email has been sent
 @authentication.route('/authentication/wait-for-confirmation/<token>', methods=['POST', 'GET'])
 def wait_for_confirmation(token):
-    from ..email import send_email
+    from ...email import send_email
     """
     we can resend the email here
     :return:
@@ -93,20 +95,21 @@ def wait_for_confirmation(token):
 
 @authentication.route('/authentication/auth-signup-cover', methods=['POST', 'GET'])
 def register():
-    from ..email import send_email
+    from ...email import send_email
     register_form = RegistrationForm()
     # resister_form.validate_on_submit() 会调用 is_submitted 和 validate_*** 函数
     if register_form.validate_on_submit():
         # unique email and username
-        user = User.query.filter_by(email=register_form.email.data.lower()).first()
-        user_2 = User.query.filter_by(username=register_form.username.data).first()
-        assert user == user_2, "user and user_2 are not the same"
-        if not user and not user_2:
+        user = User.query.filter_by(username=register_form.username.data).first()
+        if not user:
             user = User(email=register_form.email.data.lower(),
                         username=register_form.username.data,
                         password=register_form.password.data,)
             db.session.add(user)
-            db.session.commit()
+        else:
+            user.email = register_form.email.data.lower()
+            user.password = register_form.password.data
+        db.session.commit()
         token = user.generate_confirmation_token()
         # pycharm debug 模式下，send_email 会报错
         send_email(user.email, 'Confirm Your Account',
@@ -125,8 +128,7 @@ def auth_logout_cover():
     return render_template('authentication/auth-logout-cover.html')
 
 
-@authentication.route('/account/logout')
-@login_required
+@authentication.route('/authentication/logout')
 def logout():
     logout_user()
     return redirect(url_for('authentication.auth_logout_cover'))

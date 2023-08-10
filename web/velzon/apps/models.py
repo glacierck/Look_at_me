@@ -16,36 +16,15 @@ class Permission(NamedTuple):
 
 
 # db.ForeignKey('users.id') 外键约束
-user2role_map = db.Table('user2role',
+# 保了数据库层面的引用完整性，并允许数据库执行某些优化和约束检查
+user_role_map = db.Table('user_roles',
                          db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-                         db.Column('role_name', db.String(64), db.ForeignKey('roles.name'))
+                         db.Column('role_id', db.Integer, db.ForeignKey('roles.id'))
                          )
-user2leader_map = db.Table('user2leader',
-                           db.Column('user_id', db.Integer, db.ForeignKey('users.id')),
-                           db.Column('leader_id', db.Integer, db.ForeignKey('users.id'))
-                           )
-
-
-def initialize_test_data():
-    predefined_user2role_mappings = [
-        {'user_id': 1, 'role_name': 'Student'},
-        {'user_id': 2, 'role_name': 'Administrator'},
-    ]
-
-    predefined_user2leader_mappings = [
-        {'user_id': 1, 'leader_id': 2},
-        # ...
-    ]
-
-    # 使用数据库会话来插入预定义的映射关系
-    db.session.execute(user2role_map.insert(), predefined_user2role_mappings)
-    db.session.execute(user2leader_map.insert(), predefined_user2leader_mappings)
-    db.session.commit()
-
-    print("Association tables initialized successfully!")
-
-
-# 初始化函数
+leaders_follower_map = db.Table('leaders_followers',
+                                db.Column('leader_id', db.Integer, db.ForeignKey('users.id')),
+                                db.Column('follower_id', db.Integer, db.ForeignKey('users.id'))
+                                )
 
 
 class Role(db.Model):
@@ -103,27 +82,38 @@ class User(db.Model, UserMixin):
     __tablename__ = 'users'
     # -------------------login needed --------------------------
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(100), unique=True, index=True, nullable=False)
+    # 邮箱 认证用户，方便后续找回密码
+    email = db.Column(db.String(100), unique=True, index=True, nullable=True)
     # 密码
     password_hash = db.Column(db.String(128))
+
+    # 给定
+    # student
+    # ME        21           5     14
+    # leader roll in year   class  number
+    # leader
+    # ME        21           X     01
+    # administrator
+    # admin     00           X     00
     username = db.Column(db.String(100), unique=True, index=True, nullable=False)
-    leader_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     confirmed = db.Column(db.Boolean, default=False)
 
-    role = db.relationship('Role', secondary=user2role_map)  # 单向引用创建的role
-    leader = db.relationship('User', secondary=user2leader_map,
-                             primaryjoin=(user2leader_map.c.user_id == id),
-                             secondaryjoin=(user2leader_map.c.leader_id == id),
-                             backref=db.backref('followers', lazy='dynamic'))
+    # backref 可以让role直接访问user
+    roles = db.relationship('Role', secondary=user_role_map, backref=db.backref('users'))
+    # 因为关联表中都是user，他需要定义primaryjoin和secondaryjoin来指定关联的条件, lazy='dynamic'禁止自动执行查询
+    leaders = db.relationship('User', secondary=leaders_follower_map,
+                              primaryjoin=(leaders_follower_map.c.follower_id == id),
+                              secondaryjoin=(leaders_follower_map.c.leader_id == id),
+                              backref=db.backref('followers', lazy='dynamic'))
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         # 反向引用创建的role
-        if self.role is None:
+        if self.roles is None:
             if self.email == current_app.config['FLASKY_ADMIN']:
-                self.role = Role.query.filter_by(name='Administrator').first()
+                self.roles = [Role.query.filter_by(name='Administrator').first()]
             else:
-                self.role = Role.query.filter_by(default=True).first()
+                self.roles = [Role.query.filter_by(default=True).first()]
 
     @property
     def password(self):

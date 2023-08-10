@@ -25,7 +25,7 @@ def create_app():
     with app.app_context():
         db.create_all()
         Role.insert_roles()
-        init_test_data()
+        init_test_data(True)
 
     login_manager = LoginManager(app)
     login_manager.session_protection = 'strong'
@@ -45,7 +45,7 @@ def create_app():
     def auth_500(error):
         return render_template('pages/authentication/auth-500.html'), 500
 
-    from .main import dashboards, apps, layouts, pages, components, authentication
+    from .main import dashboards, apps, layouts, pages, components, authentication, profile
 
     app.register_blueprint(dashboards, url_prefix="/")
     app.register_blueprint(apps, url_prefix="/")
@@ -53,4 +53,5 @@ def create_app():
     app.register_blueprint(pages, url_prefix="/")
     app.register_blueprint(components, url_prefix="/")
     app.register_blueprint(authentication, url_prefix="/")
+    app.register_blueprint(profile, url_prefix="/")
     return app

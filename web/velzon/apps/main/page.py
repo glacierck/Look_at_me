@@ -158,10 +158,6 @@ def auth_lockscreen_cover():
     return render_template('pages/authentication/auth-lockscreen-cover.html')
 
 
-@pages.route('/authentication/auth-logout-basic')
-@login_required
-def auth_logout_basic():
-    return render_template('pages/authentication/auth-logout-basic.html')
 
 
 @pages.route('/authentication/auth-success-msg-basic')
