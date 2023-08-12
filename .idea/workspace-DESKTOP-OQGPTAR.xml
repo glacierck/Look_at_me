@@ -1,0 +1,637 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="56a0ce11-e893-4823-a96e-fd814a4c550f" name="更改" comment="try to send email to verify new account">
+      <change afterPath="$PROJECT_DIR$/tests/new.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/whole_fps_test.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/mousewheel/mousewheel.less" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/mousewheel/mousewheel.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/models.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/autoplay/autoplay-element.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/tests/Finance.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/autoplay/autoplay.less" beforeDir="false" afterPath="$PROJECT_DIR$/tests/db.sqllite" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/effect-coverflow/effect-coverflow.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/autoplay/autoplay-element.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/hash-navigation/hash-navigation-element.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/autoplay/autoplay.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/hash-navigation/hash-navigation.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/autoplay/autoplay.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/hash-navigation/hash-navigation.scss" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/autoplay/autoplay.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/history/history-element.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/controller/controller-element.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/history/history.less" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/controller/controller.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/history/history.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/controller/controller.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/history/history.scss" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/controller/controller.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/keyboard/keyboard-element.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/effect-coverflow/effect-coverflow-element.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/keyboard/keyboard.less" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/effect-coverflow/effect-coverflow.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/keyboard/keyboard.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/hash-navigation/hash-navigation-element.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/keyboard/keyboard.scss" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/hash-navigation/hash-navigation.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/manipulation/manipulation-element.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/hash-navigation/hash-navigation.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/manipulation/manipulation.less" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/history/history-element.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/manipulation/manipulation.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/history/history.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/manipulation/manipulation.scss" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/history/history.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/mousewheel/mousewheel-element.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/history/history.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/mousewheel/mousewheel.less" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/keyboard/keyboard-element.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/mousewheel/mousewheel.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/keyboard/keyboard.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/mousewheel/mousewheel.scss" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/keyboard/keyboard.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/parallax/parallax-element.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/keyboard/keyboard.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/parallax/parallax.less" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/manipulation/manipulation-element.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/parallax/parallax.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/manipulation/manipulation.less" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/parallax/parallax.scss" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/manipulation/manipulation.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/thumbs/thumbs-element.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/manipulation/manipulation.scss" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/static/libs/swiper/modules/thumbs/thumbs.min.css" beforeDir="false" afterPath="$PROJECT_DIR$/web/velzon/apps/static/libs/swiper/modules/mousewheel/mousewheel-element.min.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/apps-api-key.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/apps-calendar.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/apps-chat.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/apps-filemanager.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/apps-todo.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/crm/apps-crm-companies.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/crm/apps-crm-contacts.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/crm/apps-crm-deals.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/crm/apps-crm-leads.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/crypto/apps-crypto-buy-sell.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/crypto/apps-crypto-ico.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/crypto/apps-crypto-kyc.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/crypto/apps-crypto-orders.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/crypto/apps-crypto-transactions.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/crypto/apps-crypto-wallet.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/ecommerce/apps-ecommerce-add_product.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/ecommerce/apps-ecommerce-order_details.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/ecommerce/apps-ecommerce-orders.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/ecommerce/apps-ecommerce-product_details.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/ecommerce/apps-ecommerce-products.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/ecommerce/apps-ecommerce-sellers_details.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/ecommerce/apps-ecommerce_cart.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/ecommerce/apps-ecommerce_checkout.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/ecommerce/apps-ecommerce_customer.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/ecommerce/apps-ecommerce_sellers.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/email/apps-email_basic.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/email/apps-email_ecommerce.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/email/apps-mailbox.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/invoices/apps-invoices-create.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/invoices/apps-invoices-details.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/invoices/apps-invoices-list.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/job/apps-job-application.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/job/apps-job-candidate-grid.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/job/apps-job-candidate-lists.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/job/apps-job-categories.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/job/apps-job-companies-lists.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/job/apps-job-details.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/job/apps-job-grid-lists.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/job/apps-job-lists.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/job/apps-job-new.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/job/apps-job-statistics.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/nft/apps-nft-auction.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/nft/apps-nft-collections.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/nft/apps-nft-create.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/nft/apps-nft-creators.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/nft/apps-nft-explore.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/nft/apps-nft-item-details.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/nft/apps-nft-marketplace.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/nft/apps-nft-ranking.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/nft/apps-nft-wallet.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/projects/apps-projects-create.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/projects/apps-projects-list.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/projects/apps-projects-overview.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/tasks/apps-tasks-details.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/tasks/apps-tasks-kanban.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/tasks/apps-tasks-list-view.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/tickets/apps-tickets-details.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/apps/tickets/apps-tickets-list.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/auth/test.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/advance-ui/advance-ui-animation.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/advance-ui/advance-ui-highlight.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/advance-ui/advance-ui-nestable.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/advance-ui/advance-ui-ratings.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/advance-ui/advance-ui-scrollbar.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/advance-ui/advance-ui-scrollspy.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/advance-ui/advance-ui-sweetalerts.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/advance-ui/advance-ui-swiper.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/advance-ui/advance-ui-tour.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-accordions.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-alerts.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-badges.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-buttons.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-cards.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-carousel.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-colors.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-dropdowns.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-embed-video.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-general.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-grid.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-images.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-links.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-lists.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-media.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-modals.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-notifications.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-offcanvas.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-placeholders.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-progress.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-ribbons.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-tabs.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-typography.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/base-ui/ui-utilities.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-area.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-bar.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-boxplot.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-bubble.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-candlestick.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-column.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-funnel.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-heatmap.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-line.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-mixed.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-pie.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-polar.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-radar.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-radialbar.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-range-area.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-scatter.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-timeline.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/apexcharts/charts-apex-treemap.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/charts-chartjs.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/charts/charts-echarts.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-advanced.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-checkboxs-radios.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-editors.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-elements.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-file-uploads.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-layouts.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-masks.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-pickers.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-range-sliders.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-select.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-select2.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-validation.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/forms/forms-wizard.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/icons/icons-boxicons.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/icons/icons-crypto.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/icons/icons-feather.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/icons/icons-lineawesome.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/icons/icons-materialdesign.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/icons/icons-remix.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/maps/maps-google.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/maps/maps-leaflet.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/tables/tables-basic.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/tables/tables-datatables.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/tables/tables-gridjs.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/tables/tables-listjs.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/components/widgets/widgets.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/dashboards/dashboard-analytics.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/dashboards/dashboard-crm.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/dashboards/dashboard-crypto.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/dashboards/dashboard-job.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/dashboards/dashboard-nft.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/dashboards/dashboard-projects.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/dashboards/index.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/layouts/layouts-detached.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/layouts/layouts-horizontal.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/layouts/layouts-two-column.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/layouts/layouts-vertical-hovered.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/layouts/layouts-vertical.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/account/base_account.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/account/login.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/account/signup.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-404-basic.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-404-cover.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-500.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-lockscreen-basic.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-lockscreen-cover.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-logout-basic.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-offline.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-pass-change-basic.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-pass-reset-basic.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-signin-basic.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-signin-cover.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-signup-basic.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-signup-cover.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-success-msg-basic.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-twostep-basic.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-twostep-cover.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/authentication/auth-wait-email-confirmation.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-comingsoon.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-faqs.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-gallery.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-job-landing.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-landing.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-maintenance.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-nft-landing.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-pricing.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-privacy-policy.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-profile-settings.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-profile.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-search-results.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-sitemap.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-starter.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-team.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-term-conditions.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/pages/pages/pages-timeline.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/partials/base.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/partials/customizer.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/partials/footer.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/partials/sidebar.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/velzon/templates/partials/topbar.html" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="HTML File" />
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys&#10;sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo&#10;locals().update(ScriptInfo(create_app=None).load_app().make_shell_context())&#10;print(&quot;Python %s on %s\nApp: %s [%s]\nInstance: %s&quot; % (sys.version, sys.platform, app.import_name, app.env, app.instance_path))" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2T9D33A3zeUz9jrBnN93zVX74DB" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;20.5.0&quot;,
+    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;20.4.5&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Users/Atticus/anaconda3/Scripts/conda.exe&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\Users\Atticus\OneDrive\CXXY\Competition\DC\FR_pj\Look_at_me\web\velzon\templates\pages\authentication" />
+      <recent name="D:\Users\Atticus\OneDrive\CXXY\Competition\DC\FR_pj\Look_at_me" />
+      <recent name="D:\Users\Atticus\OneDrive\CXXY\Competition\DC\FR_pj\Look_at_me\tests" />
+      <recent name="D:\Users\Atticus\OneDrive\CXXY\Competition\DC\FR_pj\Look_at_me\web\velzon" />
+      <recent name="D:\Users\Atticus\OneDrive\CXXY\Competition\DC\FR_pj\Look_at_me\web\velzon\templates\partials" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\Users\Atticus\OneDrive\CXXY\Competition\DC\FR_pj\Look_at_me\web\velzon\apps" />
+      <recent name="D:\Users\Atticus\OneDrive\CXXY\Competition\DC\FR_pj\Look_at_me\letter" />
+      <recent name="D:\Users\Atticus\OneDrive\CXXY\Competition\DC\FR_pj\Look_at_me\web\velzon\templates\pages\authentication" />
+      <recent name="D:\Users\Atticus\OneDrive\CXXY\Competition\DC\FR_pj\Look_at_me\web\velzon\templates" />
+      <recent name="D:\Users\Atticus\OneDrive\CXXY\Competition\DC\FR_pj\Look_at_me\web\velzon\apps\main" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.docker_starter">
+    <configuration name="docker_starter" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Look_at_me" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/database/Metabase" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/database/Metabase/docker_starter.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Look_at_me" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/web" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/web/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="mest_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Look_at_me" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/mest_test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="whole_fps_test" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Look_at_me" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/whole_fps_test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Flask (web/velzon/flasky.py)" type="Python.FlaskServer" temporary="true" nameIsGenerated="true">
+      <module name="Look_at_me" />
+      <option name="target" value="$PROJECT_DIR$/web/velzon/flasky.py" />
+      <option name="targetType" value="PATH" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Flask 服务器.Flask (web/velzon/flasky.py)" />
+      <item itemvalue="Python.docker_starter" />
+      <item itemvalue="Python.whole_fps_test" />
+      <item itemvalue="Python.main" />
+      <item itemvalue="Python.mest_test" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.docker_starter" />
+        <item itemvalue="Flask 服务器.Flask (web/velzon/flasky.py)" />
+        <item itemvalue="Python.whole_fps_test" />
+        <item itemvalue="Python.mest_test" />
+        <item itemvalue="Python.main" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="应用程序级" UseSingleDictionary="true" transferred="true" />
+  <component name="SvnConfiguration">
+    <configuration>C:\Users\Atticus\AppData\Roaming\Subversion</configuration>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="默认任务">
+      <changelist id="56a0ce11-e893-4823-a96e-fd814a4c550f" name="更改" comment="" />
+      <created>1690446199308</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1690446199308</updated>
+      <workItem from="1690446208909" duration="1362000" />
+      <workItem from="1690447842106" duration="880000" />
+      <workItem from="1690448970412" duration="1643000" />
+      <workItem from="1690451477548" duration="655000" />
+      <workItem from="1690454804760" duration="3433000" />
+      <workItem from="1690505911430" duration="24409000" />
+      <workItem from="1690548483890" duration="1711000" />
+      <workItem from="1690550525895" duration="3676000" />
+      <workItem from="1690596614682" duration="14840000" />
+      <workItem from="1690686389649" duration="7926000" />
+      <workItem from="1690704464278" duration="5257000" />
+      <workItem from="1690767353513" duration="298000" />
+      <workItem from="1690767668397" duration="107000" />
+      <workItem from="1690767793700" duration="1369000" />
+      <workItem from="1690770839348" duration="5960000" />
+      <workItem from="1690786123704" duration="13153000" />
+      <workItem from="1690851950277" duration="16245000" />
+      <workItem from="1690868682211" duration="266000" />
+      <workItem from="1690868964262" duration="1657000" />
+      <workItem from="1690870648835" duration="10078000" />
+      <workItem from="1690886650532" duration="1566000" />
+      <workItem from="1690888361892" duration="221000" />
+      <workItem from="1690888601917" duration="8989000" />
+      <workItem from="1690933042230" duration="5097000" />
+      <workItem from="1691025935178" duration="14115000" />
+      <workItem from="1691041333200" duration="2724000" />
+      <workItem from="1691044097150" duration="18217000" />
+      <workItem from="1691107316155" duration="1858000" />
+      <workItem from="1691109656582" duration="8101000" />
+      <workItem from="1691118967947" duration="375000" />
+      <workItem from="1691121712574" duration="1611000" />
+      <workItem from="1691125767006" duration="10905000" />
+      <workItem from="1691138501064" duration="9835000" />
+      <workItem from="1691150038821" duration="814000" />
+      <workItem from="1691192156830" duration="18714000" />
+      <workItem from="1691212859640" duration="175000" />
+      <workItem from="1691213321230" duration="3141000" />
+      <workItem from="1691216907955" duration="4961000" />
+      <workItem from="1691221924502" duration="1725000" />
+      <workItem from="1691223981584" duration="953000" />
+      <workItem from="1691225354291" duration="107000" />
+      <workItem from="1691225485227" duration="63000" />
+      <workItem from="1691230608815" duration="1000" />
+      <workItem from="1691238237144" duration="1874000" />
+      <workItem from="1691242312777" duration="1497000" />
+      <workItem from="1691243842524" duration="68000" />
+      <workItem from="1691294709080" duration="1522000" />
+    </task>
+    <task id="LOCAL-00001" summary="add milvus_for_realtime.py">
+      <option name="closed" value="true" />
+      <created>1690458244742</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1690458244742</updated>
+    </task>
+    <task id="LOCAL-00002" summary="almost finished the face_recognition module">
+      <option name="closed" value="true" />
+      <created>1690527815890</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1690527815890</updated>
+    </task>
+    <task id="LOCAL-00003" summary="make the milvus insert and search at same time be possible ,and drop the unnecessary processes of start milvus server">
+      <option name="closed" value="true" />
+      <created>1690811338058</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1690811338058</updated>
+    </task>
+    <task id="LOCAL-00004" summary="add docker_starter">
+      <option name="closed" value="true" />
+      <created>1690880718741</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1690880718741</updated>
+    </task>
+    <task id="LOCAL-00005" summary="face recognition module has been fixed by several test">
+      <option name="closed" value="true" />
+      <created>1691117784470</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1691117784470</updated>
+    </task>
+    <task id="LOCAL-00006" summary="web log">
+      <option name="closed" value="true" />
+      <created>1691149641087</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1691149641087</updated>
+    </task>
+    <task id="LOCAL-00007" summary="finished  email-to-verify.html">
+      <option name="closed" value="true" />
+      <created>1691150790440</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1691150790440</updated>
+    </task>
+    <task id="LOCAL-00008" summary="try to send email to verify new account">
+      <option name="closed" value="true" />
+      <created>1691296039305</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1691296039305</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$" />
+    </ignored-roots>
+    <MESSAGE value="add milvus_for_realtime.py" />
+    <MESSAGE value="almost finished the face_recognition module" />
+    <MESSAGE value="make the milvus insert and search at same time be possible ,and drop the unnecessary processes of start milvus server" />
+    <MESSAGE value="add docker_starter" />
+    <MESSAGE value="face recognition module has been fixed by several test" />
+    <MESSAGE value="web log" />
+    <MESSAGE value="finished  email-to-verify.html" />
+    <MESSAGE value="try to send email to verify new account" />
+    <option name="LAST_COMMIT_MESSAGE" value="try to send email to verify new account" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/database/milvus_standalone/hello_milvus.py</url>
+          <line>19</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/tests/new_detector_fps.py</url>
+          <line>18</line>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/web/velzon/apps/auth/views.py</url>
+          <line>100</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/web/velzon/apps/auth/views.py</url>
+          <line>86</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/web/velzon/apps/auth/views.py</url>
+          <line>131</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Look_at_me$whole_fps_test.coverage" NAME="whole_fps_test 覆盖结果" MODIFIED="1691242763118" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/Look_at_me$mest_test.coverage" NAME="mest_test 覆盖结果" MODIFIED="1691242411921" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/Look_at_me$Flask__web_velzon_flasky_py_.coverage" NAME="Flask (web/velzon/flasky.py) 覆盖结果" MODIFIED="1691242909230" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/Look_at_me$docker_starter.coverage" NAME="docker_starter 覆盖结果" MODIFIED="1691243558263" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/database/Metabase" />
+  </component>
+</project>

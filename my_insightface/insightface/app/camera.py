@@ -1,6 +1,7 @@
 import queue
 import subprocess
 from pathlib import Path
+from time import sleep
 
 import cv2
 from ..data import LightImage

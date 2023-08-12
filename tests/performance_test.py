@@ -26,8 +26,10 @@ def ave_fps_test(result_filename: str = 'ave_fps_test.json', test_func=None):
     else:
         camera_test = {}
 
-    resolution = input('\ninput resolution: ').strip().split('x')
-    fps = int(input('input fps: '))
+    # resolution = input('\ninput resolution: ').strip().split('x')
+    resolution = "1920x1080".split('x')
+    # fps = int(input('input fps: '))
+    fps = 30
     fps, resolution = test_func(resolution=resolution, fps=fps)
     # set,actual,measure
     key = f'{resolution[0]}x{resolution[1]}'

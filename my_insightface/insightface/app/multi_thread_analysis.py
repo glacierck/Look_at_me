@@ -5,7 +5,6 @@ from time import sleep
 import cv2
 from timeit import default_timer as current_time
 import functools
-
 from .camera import Camera
 from .detector import Detector
 from .identifier import Identifier
@@ -13,7 +12,9 @@ from .screen import Screen
 
 COST_TIME = {}
 threads_done = Event()
-__all__ = ["MultiThreadFaceAnalysis", "COST_TIME", "threads_done"]
+streaming_event = Event()
+image2web_queue = queue.Queue(maxsize=400)
+__all__ = ["MultiThreadFaceAnalysis", "COST_TIME", "threads_done", "streaming_event"]
 
 
 def cost_time_recording(func):
@@ -84,6 +85,27 @@ class MultiThreadFaceAnalysis:
                 ide_res = self._identifier.identified_results(to_update)
                 results.put(ide_res)
 
+            except queue.Empty:
+                print("detect2identify is empty")
+                break
+
+    @cost_time_recording
+    def image2web(self, jobs: queue.Queue):
+        print("image2web start")
+        self.show_times = 0
+        while not threads_done.is_set():
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                threads_done.set()
+                break
+            try:
+                to_update = jobs.get(timeout=10)
+                to_web = self._screen.show(to_update)
+                # 没有请求之前不 捕获图像
+                if streaming_event.is_set():
+                    image2web_queue.put(to_web)
+                else:
+                    cv2.imshow("screen", to_web)
+                self.show_times += 1
             except queue.Empty:
                 print("detect2identify is empty")
                 break

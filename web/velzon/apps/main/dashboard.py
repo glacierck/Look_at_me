@@ -1,5 +1,10 @@
-from flask import Blueprint, render_template, current_app
+import time
+
+import cv2
+from flask import Blueprint, render_template, current_app, Response
 from flask_login import login_required, current_user
+
+from my_insightface.insightface.app.multi_thread_analysis import streaming_event, image2web_queue, threads_done
 
 dashboards = Blueprint(
     "dashboards",
@@ -28,14 +33,30 @@ def dashboard_crm():
     return render_template("dashboards/dashboard-crm.html")
 
 
-# @app.route("/video_feed")
-# def video_feed():
-#     streaming_event.set()  # 客户端开始请求，设置事件
-#     response = Response(
-#         generate(), mimetype="multipart/x-mixed-replace; boundary=frame"
-#     )
-#     response.call_on_close(streaming_event.clear)  # 客户端停止请求，重置事件
-#     return response
+def generate():
+    while True:
+        # print("image2web_queue.qsize() = ", image2web_queue.qsize())
+        # print("streaming_event.is_set() = ", streaming_event.is_set())
+        if streaming_event.is_set() and not image2web_queue.empty():  # 只有在有客户端请求时才获取图像
+            frame = image2web_queue.get()
+            _, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        # time.sleep(0.1)  # 控制获取速度
+        # elif image2web_queue.empty():
+        #     print("image2web_queue is empty")
+
+
+@dashboards.route("/video_feed")
+@login_required
+def video_feed():
+    streaming_event.set()  # 客户端开始请求，设置事件
+    response = Response(
+        generate(), mimetype="multipart/x-mixed-replace; boundary=frame"
+    )
+    response.call_on_close(streaming_event.clear)  # 客户端停止请求，重置事件
+    return response
 
 
 @dashboards.route("/dashboard-crypto/")

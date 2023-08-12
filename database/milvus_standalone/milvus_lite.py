@@ -345,11 +345,11 @@ class Milvus:
     # noinspection PyTypeChecker
     def search(self, search_vectors: list[np.ndarray]) -> list[list[dict]]:
         # search_vectors可以是多个向量
-        print(f"\nSearching ...")
+        # print(f"\nSearching ...")
         results = self.collection.search(
             data=search_vectors, **self._collection_search_param
         )
-        print("collecting results ...")
+        # print("collecting results ...")
         ret_results = [[] for _ in range(len(results))]
         for i, hits in enumerate(results):
             for hit in hits:
@@ -360,7 +360,7 @@ class Milvus:
                         "name": hit.entity.get(self._name_field_param["name"]),
                     }
                 )
-        pprint.pprint(f"Search results : {ret_results}")
+        # pprint.pprint(f"Search results : {ret_results}")
         return ret_results
 
     # 删除集合中的所有实体,并且关闭服务器

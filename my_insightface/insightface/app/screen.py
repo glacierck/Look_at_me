@@ -1,3 +1,6 @@
+import queue
+from collections import deque
+from timeit import default_timer as current_time
 import cv2
 import numpy as np
 from numpy import ndarray
@@ -9,17 +12,19 @@ class Screen:
     def __init__(self):
         self._frame_cnt = 0
         self.image_size = None
+        self._interval_time = deque(maxlen=2)
 
-    def show(self, image2show: LightImage):
+    def show(self, image2show: LightImage) -> ndarray:
         self._frame_cnt += 1
         if self._frame_cnt > 10000:
             self._frame_cnt = 0
         image2show_nd_arr = self.resize_image(self._draw_on(image2show))
-        cv2.imshow('screen', image2show_nd_arr)
-        return image2show
+
+        # cv2.imshow('screen', image2show_nd_arr)
+        return image2show_nd_arr
 
     @staticmethod
-    def resize_image(image2resize: ndarray, target_size=(1294, 800)) -> ndarray:
+    def resize_image(image2resize: ndarray, target_size=(1056, 458)) -> ndarray:
         """
         cv2.INTER_AREA：区域插值 效果最好，但速度慢
         cv2.INTER_CUBIC ：三次样条插值，效率居中
@@ -126,8 +131,24 @@ class Screen:
 
         return dimg
 
+    def _draw_fps(self, image2draw_on: LightImage):
+
+        if len(self._interval_time) == 2:
+            self._interval_time.append(current_time())
+            interval = self._interval_time[-1] - self._interval_time[0]
+            cv2.putText(
+                image2draw_on.nd_arr,
+                f"fps = {1 / interval :.2f}",
+                (10, 30),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 255, 0),
+                2,
+            )
+
     def _draw_on(self, image2draw_on: LightImage):
         dimg = image2draw_on.nd_arr
+        self._draw_fps(image2draw_on)
         for face in image2draw_on.faces:
             # face=[bbox, kps, det_score, color, match_info]
             bbox = face[0].astype(int)
