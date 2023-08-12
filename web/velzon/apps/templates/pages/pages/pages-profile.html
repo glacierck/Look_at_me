@@ -1,0 +1,481 @@
+{% extends "partials/base.html" %}
+{% block title %}Profile{% endblock title %}
+{% block extra_css %}
+    <!-- swiper css -->
+    <link rel="stylesheet" href="{{ url_for('static' ,filename='libs/swiper/swiper-bundle.min.css') }}">
+{% endblock extra_css %}
+{% block content %}
+    <!-- ============================================================== -->
+    <!-- Start right Content here -->
+    <!-- ============================================================== -->
+    <div class="main-content">
+
+        <div class="page-content">
+            {#                    <div class="profile-foreground position-relative mx-n4 mt-n4">#}
+            {#                            <div class="profile-wid-bg bg-transparent border-top">#}
+            {#                                <img src="{{url_for('static' ,filename='images/profile-bg.jpg')}}" alt="" class="profile-wid-img" />#}
+            {#                            </div>#}
+            {#                        </div>#}
+            <div class="container-fluid">
+                <div class="profile-wid-bg profile-setting-img">
+                    <img src="{{ url_for('static' ,filename='images/profile-bg.jpg') }}" class="profile-wid-img" alt="">
+                    <div class="overlay-content">
+                        <div class="text-end p-3">
+                            <div class="p-0 ms-auto rounded-circle profile-photo-edit">
+                                <input id="profile-foreground-img-file-input" type="file"
+                                       class="profile-foreground-img-file-input">
+                                <label for="profile-foreground-img-file-input" class="profile-photo-edit btn btn-light">
+                                    <i class="ri-image-edit-line align-bottom me-1"></i> Change Cover
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-4 mb-4 mb-lg-3 pb-lg-4 profile-wrapper">
+                    <div class="row g-4">
+                        <div class="col-auto">
+                            <div class="avatar-lg">
+                                <img src="{{ url_for('static' ,filename='images/users/' + current_user.avatar_file) }}"
+                                     alt="user-img" class="img-thumbnail rounded-circle"/>
+                            </div>
+                        </div>
+                        <!--end col-->
+                        <div class="col">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="p-2">
+                                        <h3 class="mb-1"> {{ current_user.full_name }}</h3>
+                                        <div class="hstack text-muted gap-1">
+                                            <div class="me-2"><i
+                                                    class="ri-map-pin-user-line me-1 fs-16 align-bottom text-body"></i><strong>{{ current_user.identity }}</strong>
+                                            </div>
+                                            <div>
+                                                <i class="ri-building-line me-1 fs-16 align-bottom text-body"></i><strong>{{ current_user.hometown }}</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--end col-->
+
+                    </div>
+                    <!--end row-->
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div>
+                            <div class="d-flex profile-wrapper">
+                                <!-- Nav tabs -->
+                                <ul class="nav nav-pills animation-nav profile-nav gap-2 gap-lg-3 flex-grow-1"
+                                    role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link fs-14 active" data-bs-toggle="tab" href="#overview-tab"
+                                           role="tab">
+                                            <i class="ri-airplay-fill d-inline-block d-md-none"></i> <span
+                                                class="d-none d-md-inline-block">Overview</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="flex-shrink-0">
+                                    <a href="{{ url_for("profile.settings",username=current_user.username) }}"
+                                       class="btn btn-success"><i class="ri-edit-box-line align-bottom"></i> Edit
+                                        Profile</a>
+                                </div>
+                            </div>
+                            <!-- Tab panes -->
+                            <div class="tab-content pt-4 text-muted">
+                                <div class="tab-pane active" id="overview-tab" role="tabpanel">
+                                    <div class="row">
+                                        <div class="col-xxl-3">
+                                            <div class="card">
+                                                {% if current_user.position %}
+                                                    <div class="ribbon-three ribbon-three-success"><span>Within</span>
+                                                    </div>
+                                                {% else %}
+                                                    <div class="ribbon-three ribbon-three-danger"><span>Outside</span>
+                                                    </div>
+                                                {% endif %}
+                                                <div class="card-body">
+
+                                                    <h5 class="card-title mb-5 text-end">Complete Your Profile</h5>
+                                                    <div class="progress animated-progress custom-progress progress-label">
+                                                        <div class="progress-bar bg-danger" role="progressbar"
+                                                             style="width: {{ current_user.profile_completion }}%"
+                                                             aria-valuenow="30" aria-valuemin="0" aria-valuemax="100">
+                                                            <div class="label">{{ current_user.profile_completion }}%</div>
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h5 class="card-title mb-3">Info</h5>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-borderless mb-0">
+                                                            <tbody>
+                                                            <tr>
+                                                                <th class="ps-0" scope="row">Full Name :</th>
+                                                                <td class="text-muted">
+                                                                    {{ current_user.full_name }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="ps-0" scope="row">Mobile :</th>
+                                                                {# {{ current_user.mobile }}#}
+                                                                <td class="text-muted">+(86)
+                                                                    {{ current_user.phone }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="ps-0" scope="row">E-mail :</th>
+                                                                <td class="text-muted">
+                                                                    {{ current_user.email }}</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <th class="ps-0" scope="row">Enrolled Date :</th>
+                                                                {# {{ current_user.enrolled data }}#}
+                                                                <td class="text-muted">
+                                                                    {{ current_user.enrolled_data }}</td>
+                                                            </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div><!-- end card body -->
+                                            </div><!-- end card -->
+
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="d-flex align-items-center mb-4">
+                                                        <div class="flex-grow-1">
+                                                            <h5 class="card-title mb-0">Portfolio</h5>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="mb-3 d-flex">
+                                                        <div class="avatar-xs d-block flex-shrink-0 me-3">
+                                                                    <span class="avatar-title rounded-circle fs-16 bg-primary">
+                                                                        <i class=" ri-instagram-line"></i>
+                                                                    </span>
+                                                        </div>
+
+                                                        <input type="email" class="form-control" id="gitUsername"
+                                                               placeholder="Username" name="instagram"
+                                                               value="{{ current_user.instagram }} " readonly>
+                                                    </div>
+                                                    <div class="mb-3 d-flex">
+                                                        <div class="avatar-xs d-block flex-shrink-0 me-3">
+                                                                    <span class="avatar-title rounded-circle fs-16 bg-success">
+                                                                        <i class="ri-wechat-fill"></i>
+                                                                    </span>
+                                                        </div>
+
+                                                        <input type="text" class="form-control" id="websiteInput"
+                                                               placeholder="www.example.com" name="wechat"
+                                                               value="{{ current_user.wechat }}" readonly>
+                                                    </div>
+                                                    <div class="mb-3 d-flex">
+                                                        <div class="avatar-xs d-block flex-shrink-0 me-3">
+                                                                    <span class="avatar-title rounded-circle fs-16 bg-info">
+                                                                        <i class="ri-qq-fill"></i>
+                                                                    </span>
+                                                        </div>
+
+                                                        <input type="text" class="form-control" id="dribbleName"
+                                                               placeholder="Username" name="qq"
+                                                               value="{{ current_user.qq }}" readonly>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <div class="avatar-xs d-block flex-shrink-0 me-3">
+                                                                    <span class="avatar-title rounded-circle fs-16 bg-secondary">
+                                                                        <i class="ri-twitter-fill"></i>
+                                                                    </span>
+                                                        </div>
+                                                        <input type="text" class="form-control" id="pinterestName"
+                                                               placeholder="Username" name="twitter"
+                                                               value="{{ current_user.twitter }}" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--end card-->
+                                        </div>
+                                        <!--end col-->
+                                        <div class="col-xxl-9">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="table-responsive">
+                                                                <form id="upload_passport"
+                                                                      action="{{ url_for('profile.details',username=current_user.username) }}"
+                                                                      method="POST" enctype="multipart/form-data">
+                                                                    {{ form.csrf_token }}
+                                                                    <table class="table table-borderless align-middle mb-0">
+                                                                        <thead class="table-light">
+                                                                        <tr>
+                                                                            <th scope="col">Passport</th>
+                                                                            <th scope="col">State</th>
+                                                                            <th scope="col">Upload</th>
+                                                                            <th scope="col">Delete</th>
+                                                                        </tr>
+                                                                        </thead>
+
+                                                                        <tbody>
+
+                                                                        <tr>
+
+                                                                            <td>
+                                                                                <button type="button"
+                                                                                        class="btn btn-warning custom-toggle active">
+                                                                                    <span class="icon-off"><i
+                                                                                            class="las la-grin-stars icon-with-margin"
+                                                                                            style="font-size: 24px;"></i></span>
+                                                                                    Face Recognition
+                                                                                </button>
+                                                                            </td>
+                                                                            <td>
+                                                                                {% if current_user.f_rec_passport_state == "Checking" %}
+                                                                                    <button type="button"
+                                                                                            class="btn btn-outline-warning btn-load rounded-pill">
+                                                                                    <span class="d-flex align-items-center">
+                                                                                        <span class="flex-grow-1 me-2">
+                                                                                            Checking...
+                                                                                        </span>
+                                                                                        <i class="mdi mdi-spin mdi-loading"></i>
+                                                                                    </span>
+                                                                                    </button>
+                                                                                {% elif current_user.f_rec_passport_state=="Approved" %}
+                                                                                    <button type="button"
+                                                                                            class="btn btn-outline-success rounded-pill">
+                                                                                    <span class="d-flex align-items-center">
+                                                                                        <span class="flex-grow-1 me-2">
+                                                                                            Approved
+                                                                                        </span>
+                                                                                        <i class="ri-check-double-line label-icon align-middle rounded-pill fs-16 ms-2"></i>
+                                                                                    </span>
+                                                                                    </button>
+                                                                                {% elif current_user.f_rec_passport_state =="Empty" %}
+                                                                                    <button type="button"
+                                                                                            class="btn btn-outline-danger rounded-pill">
+                                                                                    <span class="d-flex align-items-center">
+                                                                                        <span class="flex-grow-1 me-2">
+                                                                                            Empty
+                                                                                        </span>
+                                                                                        <i class="las la-times"></i>
+                                                                                    </span>
+                                                                                    </button>
+                                                                                {% endif %}
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="flex-shrink-0 "
+                                                                                     style="position: relative; display: inline-block; width: auto;">
+
+                                                                                    <input class="form-control d-none"
+                                                                                           type="file" id="formFile"
+                                                                                           name="face_recognition">
+                                                                                    <label for="formFile"
+                                                                                           class="btn btn-outline-success btn-icon waves-effect waves-light"><i
+                                                                                            class="ri-upload-cloud-2-line me-1 align-bottom"></i></label>
+                                                                                    <div class="progress-container"
+                                                                                         style="position: relative; width: 100%; left: 0; top: 0; text-align: center;">
+                                                                                        <div class="progress">
+                                                                                            <div id="uploadProgress"
+                                                                                                 class="progress-bar"
+                                                                                                 role="progressbar"
+                                                                                                 style="width: 0%; background-color: #65b9de"
+                                                                                                 aria-valuenow="0"
+                                                                                                 aria-valuemin="0"
+                                                                                                 aria-valuemax="100"></div>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    {% for error in form.face_recognition.errors %}
+                                                                                        <!-- Warning Alert -->
+                                                                                        <div class="alert alert-warning alert-border-left alert-dismissible fade show"
+                                                                                             role="alert">
+                                                                                            <i class="ri-alert-line me-3 align-middle"></i>
+                                                                                            <strong>{{ error }}</strong>
+                                                                                            <button type="button"
+                                                                                                    class="btn-close"
+                                                                                                    data-bs-dismiss="alert"
+                                                                                                    aria-label="Close"></button>
+                                                                                        </div>
+                                                                                    {% endfor %}
+                                                                                </div>
+                                                                            </td>
+                                                                            <td>
+                                                                                <div class="flex-shrink-0">
+                                                                                    <button type="button"
+                                                                                            class="btn btn-outline-danger btn-icon waves-effect waves-light">
+                                                                                        <i class="ri-delete-bin-5-line me-1 align-bottom"></i>
+                                                                                    </button>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--end card-->
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+
+                                                            <div class="table-responsive">
+                                                                <table id="activities-table"
+                                                                       class="table table-borderless align-middle mb-0">
+                                                                    <thead class="table-light">
+                                                                    <tr>
+                                                                        <th scope="col">Recent Activity</th>
+                                                                        <th scope="col">Action</th>
+                                                                        <th scope="col">Date</th>
+                                                                        <th scope="col">Time</th>
+                                                                    </tr>
+
+                                                                    </thead>
+
+                                                                    <tbody>
+                                                                    {% for i,activity in current_user.recent_activity %}
+                                                                        <tr>
+                                                                            <td class="fw-medium">{{ i }}</td>
+                                                                            <td>
+                                                                                {{ activity['action'] }}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ activity['date'] }}
+                                                                            </td>
+                                                                            <td>
+                                                                                {{ activity['time'] }}
+                                                                            </td>
+                                                                        </tr>
+                                                                    {% endfor %}
+                                                                    </tbody>
+                                                                </table>
+                                                                <div class="text-center mt-3">
+                                                                    <a class="text-success"><i
+                                                                            class="mdi mdi-loading mdi-spin fs-20 align-middle me-2"></i>
+                                                                        Load more </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <!--end card-->
+                                        </div>
+                                        <!--end col-->
+                                    </div>
+                                    <!--end row-->
+                                </div>
+
+                            </div>
+                            <!--end tab-pane-->
+                        </div>
+                        <!--end tab-content-->
+                    </div>
+                </div>
+                <!--end col-->
+            </div>
+            <!--end row-->
+
+        </div><!-- container-fluid -->
+    </div><!-- End Page-content -->
+    {% block footer %}
+        {% include "partials/footer.html" %}
+    {% endblock footer %}
+    <!-- end main content-->
+{% endblock content %}
+{% block extra_js %}
+    <!-- swiper js -->
+    <script src="{{ url_for('static' ,filename='libs/swiper/swiper-bundle.min.js') }}"></script>
+
+    <!-- profile init js -->
+    <script src="{{ url_for('static' ,filename='js/pages/profile.init.js') }}"></script>
+    <!-- 滑动加载更多 -->
+    <!--
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.20/lodash.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var offset = -4;
+
+            console.log("Get More activities Script is running!"); // 确保脚本运行
+
+            var loadMoreActivities = _.throttle(function() {
+                console.log("Scrolling detected"); // 检测到滚动
+
+                if ($(window).scrollTop() + $(window).height() === $(document).height()) {
+                    console.log("Reached bottom of the page"); // 滚动到页面底部
+
+                    offset += 5;
+
+                    $.get('/profile/' + "" + '/get_more_activities/' + offset, function(data) {
+                        console.log("Received data", data); // 打印收到的数据
+
+                        if (data.message && data.message === 'No more activities') {
+                            console.log("No more activities");
+                        } else {
+                            data.forEach(function(activity) {
+                                var row = '<tr><td class="fw-medium">' + offset + '</td><td>' +
+                                          activity.action + '</td><td>' +
+                                          activity.date + '</td><td>' +
+                                          activity.time + '</td></tr>';
+                                $('#activities-table tbody').append(row); // 仅选择特定表格
+                                offset++;
+                            });
+                        }
+                    }).fail(function(jqXHR, textStatus, errorThrown) {
+                        console.error("Ajax request failed", textStatus, errorThrown); // 打印Ajax请求失败的信息
+                    });
+                }
+            }, 200); // 每200毫秒最多执行一次
+
+            $(window).on('scroll', loadMoreActivities);
+        });
+
+
+    </script>-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#formFile").on("change", function () {
+                var formData = new FormData();
+                formData.append("face_recognition", $("#formFile")[0].files[0]);
+
+                $.ajax({
+                    xhr: function () {
+                        var xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function (e) {
+                            if (e.lengthComputable) {
+                                var percent = Math.round((e.loaded / e.total) * 100);
+                                $("#uploadProgress").css("width", percent + "%").attr("aria-valuenow", percent);
+                            }
+                        }, false);
+                        return xhr;
+                    },
+                    url: "{{ url_for('profile.details',username=current_user.username) }}", // 替换为你的上传URL
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (data) {
+                        // 如果需要，可以在此处处理响应数据
+                        $("#upload_passport").submit(); // 替换为你的表单ID，以触发表单提交
+                    },
+                    error: function () {
+                        alert("Upload failed.");
+                    }
+                });
+            });
+        });
+
+    </script>
+{% endblock extra_js %}

@@ -1,17 +1,20 @@
 import json
 import pprint
 import random
+from datetime import datetime, timedelta
 
 from sqlalchemy import and_, not_
 
 from . import db
-from .models import Role, User
+from .models import Role, User, Activity
 
 # 预定义一些可能的学科
-subjects = ['ME', 'CS', 'EE']
+subjects = ["ME", "CS", "EE"]
 
 
-def generate_predefined_users(num_students: int = 50, num_counselors: int = 50, num_admins: int = 1):
+def generate_predefined_users(
+        num_students: int = 20, num_counselors: int = 10, num_admins: int = 1
+):
     _predefined_users = []
 
     # 生成学生
@@ -21,7 +24,7 @@ def generate_predefined_users(num_students: int = 50, num_counselors: int = 50, 
         class_number = str(random.randint(1, 8)).zfill(1)
         student_number = str(random.randint(1, num_students)).zfill(2)
         username = f"{subject}{roll}{class_number}{student_number}"
-        _predefined_users.append({'username': username, 'role': 'Student'})
+        _predefined_users.append({"username": username, "role": "Student"})
     assert 1 <= num_counselors <= 99, "Number of counselors should be between 1 and 99!"
     # 生成领导者
     for _ in range(num_counselors):
@@ -29,22 +32,21 @@ def generate_predefined_users(num_students: int = 50, num_counselors: int = 50, 
         roll = str(random.randint(10, 30))
         counselor_number = str(random.randint(1, num_counselors)).zfill(2)
         username = f"{subject}{roll}X{counselor_number}"
-        _predefined_users.append({'username': username, 'role': 'Counselor'})
+        _predefined_users.append({"username": username, "role": "Counselor"})
     assert num_admins == 1, "Only one administrator is allowed!"
     # 生成管理员
     for _ in range(num_admins):
         username = "admin00X00"
-        _predefined_users.append({'username': username, 'role': 'Administrator'})
+        _predefined_users.append({"username": username, "role": "Administrator"})
 
     return _predefined_users
 
 
-
-
-if __name__ == '__main__':
-    # 调用函数生成预定义的用户
-    predefined_users = generate_predefined_users()
-    pprint.pprint(predefined_users)
+#
+# if __name__ == '__main__':
+#     # 调用函数生成预定义的用户
+#     predefined_users = generate_predefined_users()
+#     pprint.pprint(predefined_users)
 
 
 def init_test_data(init_db: bool = False):
@@ -53,6 +55,7 @@ def init_test_data(init_db: bool = False):
         predefined_users = generate_predefined_users()
         create_predefined_users(predefined_users)
         create_relationship()
+        create_test_activities()
     # 调用该函数将用户信息导出为JSON
     export_users_to_json()
     print("Test data initialized successfully!")
@@ -62,34 +65,60 @@ def create_predefined_users(_predefined_users):
 
     # 创建用户
     for user_info in _predefined_users:
-        existing_user = User.query.filter_by(username=user_info['username']).first()
+        existing_user = User.query.filter_by(username=user_info["username"]).first()
         if existing_user is not None:
             continue
-        role = Role.query.filter_by(name=user_info['role']).first()
+        role = Role.query.filter_by(name=user_info["role"]).first()
 
-        user = User(username=user_info['username'],
-                    roles=[role])  # 设置角色
+        user = User(username=user_info["username"], roles=[role])  # 设置角色
         db.session.add(user)
     # 保存更改
     db.session.commit()
     print("predefined Users created successfully!")
 
 
+def create_test_activities():
+    # 获取所有用户
+    users = User.query.all()
+    for user in users:
+        # 循环5次，为用户创建5条活动记录
+        for _ in range(20):
+            # 创建随机时间
+            random_time = datetime.utcnow() - timedelta(days=random.randint(0, 10))
+
+            # 创建随机动作，你可以根据实际需求修改
+            random_action = bool(random.getrandbits(1))
+
+            # 创建Activity实例并与用户关联
+            activity = Activity(
+                user_id=user.id,
+                action=random_action,
+                date=random_time,  # 我认为你可能想在这里存储日期
+                time=random_time.time(),  # 这里存储时间
+            )
+
+            # 将活动添加到数据库会话
+            db.session.add(activity)
+    # 提交会话以将活动保存到数据库
+    db.session.commit()
+    print("Test activities created successfully!")
+
+
 def create_relationship():
     # 所有用户除了admin自己都要被他领导
-    users = User.query.filter(User.username != 'admin00X00').all()
-    admin = User.query.filter_by(username='admin00X00').first()
+    users = User.query.filter(User.username != "admin00X00").all()
+    admin = User.query.filter_by(username="admin00X00").first()
     for user in users:
         user.leaders.append(admin)
 
     for subject in subjects:
         # find leader
-        leaders = User.query.filter(User.username.like(f'{subject}__X%')).all()
+        leaders = User.query.filter(User.username.like(f"{subject}__X%")).all()
         # find students
         students = User.query.filter(
             and_(
-                User.username.like(f'{subject}___%'),
-                not_(User.username.like(f'{subject}__X%'))
+                User.username.like(f"{subject}___%"),
+                not_(User.username.like(f"{subject}__X%")),
             )
         ).all()
         for student in students:
@@ -109,17 +138,17 @@ def export_users_to_json():
     users_list = []
     for user in users:
         user_info = {
-            'id': user.id,
-            'email': user.email,
-            'username': user.username,
-            'role': [role.name for role in user.roles],
-            'leader': [leader.username for leader in user.leaders],
-            'followers': [follower.username for follower in user.followers]
+            "id": user.id,
+            "email": user.email,
+            "username": user.username,
+            "role": [role.name for role in user.roles],
+            "leader": [leader.username for leader in user.leaders],
+            "followers": [follower.username for follower in user.followers],
         }
         users_list.append(user_info)
 
     # 将用户信息保存为JSON文件
-    with open('users.json', 'w', encoding='utf-8') as f:
+    with open("users.json", "w", encoding="utf-8") as f:
         json.dump(users_list, f, ensure_ascii=False, indent=4)
 
     print("Users exported to users.json successfully!")

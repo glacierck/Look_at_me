@@ -95,6 +95,10 @@ def wait_for_confirmation(token):
 
 @authentication.route('/authentication/auth-signup-cover', methods=['POST', 'GET'])
 def register():
+    """
+    use the given username to register
+    Returns:
+    """
     from ...email import send_email
     register_form = RegistrationForm()
     # resister_form.validate_on_submit() 会调用 is_submitted 和 validate_*** 函数
@@ -104,7 +108,7 @@ def register():
         if not user:
             user = User(email=register_form.email.data.lower(),
                         username=register_form.username.data,
-                        password=register_form.password.data,)
+                        password=register_form.password.data, )
             db.session.add(user)
         else:
             user.email = register_form.email.data.lower()
@@ -116,19 +120,13 @@ def register():
                    'auth/email-to-verify', user=user, token=token)
         # flash('A confirmation email has been sent to you by email.')
         return redirect(url_for('authentication.wait_for_confirmation', token=token))
-    elif register_form.email.data and register_form.username.data:
-        flash('Email or username has been registered !')
     return render_template('authentication/auth-signup-cover.html', form=register_form)
 
 
 # -----------------------------logout-------------------------------------
-@authentication.route('/authentication/auth-logout-cover')
-@login_required
-def auth_logout_cover():
-    return render_template('authentication/auth-logout-cover.html')
 
 
 @authentication.route('/authentication/logout')
 def logout():
     logout_user()
-    return redirect(url_for('authentication.auth_logout_cover'))
+    return render_template('authentication/auth-logout-cover.html')
