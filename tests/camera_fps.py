@@ -1,12 +1,15 @@
 from threading import Thread
 from queue import Queue
 
+from line_profiler_pycharm import profile
+
 from performance_test import ave_fps_test
 from my_insightface.insightface.app.multi_thread_analysis import MultiThreadFaceAnalysis, COST_TIME, threads_done
 
 video_2_show = Queue(maxsize=400)
 
 
+@profile
 def camera_fps_test(resolution: tuple[int, int], fps: int) -> tuple[tuple[str], tuple[str]]:
     camera_params = {'app': 'auto_focus', 'approach': 'usb',
                      'fps': fps, 'resolution': resolution}

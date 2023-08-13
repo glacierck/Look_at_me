@@ -10,9 +10,15 @@ from ..data import LightImage
 
 class Screen:
     def __init__(self):
+        self._interval_time_sum_cnt = 0
         self._frame_cnt = 0
         self.image_size = None
         self._interval_time = deque(maxlen=2)
+        self._interval = deque(maxlen=200)
+        self._temp_sum = 0
+        self.ave_fps = 0
+        self._pre = 0
+        self._cur = 0
 
     def show(self, image2show: LightImage) -> ndarray:
         self._frame_cnt += 1
@@ -50,7 +56,7 @@ class Screen:
         # 定义矩形的四个角的坐标
         pt1 = (bbox[0], bbox[1])
         pt2 = (bbox[2], bbox[3])
-        self.bbox_thickness = 2
+        self.bbox_thickness = 4
         # 定义直角附近线段的长度
         line_len = int(0.08 * (pt2[0] - pt1[0]) + 0.06 * (pt2[1] - pt1[1]))
         inner_line_len = int(line_len * 0.718) if bbox_color != (0, 0, 255) else line_len
@@ -58,10 +64,6 @@ class Screen:
         def draw_line(_pt1, _pt2):
             cv2.line(dimg, _pt1, _pt2, bbox_color, self.bbox_thickness)
 
-        if bbox_color == (0, 0, 255):
-            # if red color, draw rectangle directly
-            cv2.rectangle(dimg, (bbox[0], bbox[1]), (bbox[2], bbox[3]), bbox_color, 1)
-            r = 0  # 画直角的时候，不需要圆角
         draw_line((pt1[0], pt1[1]), (pt1[0] + inner_line_len, pt1[1]))
         draw_line((pt1[0], pt1[1]), (pt1[0], pt1[1] + line_len))
         draw_line((pt2[0], pt1[1]), (pt2[0] - inner_line_len, pt1[1]))
@@ -93,7 +95,7 @@ class Screen:
                     fontFace=cv2.FONT_HERSHEY_SIMPLEX,
                     fontScale=self.font_scale,
                     color=color,
-                    thickness=1,
+                    thickness=3,
                     lineType=cv2.LINE_AA)
 
     def _draw_cross(self, dimg, bbox, color):
@@ -102,7 +104,7 @@ class Screen:
         scale = 0.2
         # 计算中心点坐标
         center_x, center_y = (x1 + x2) // 2, (y1 + y2) // 2
-        self._cross_line_thickness = 2 if color != (0, 0, 255) else 3
+        self._cross_line_thickness = 4 if color != (0, 0, 255) else 5
         # 计算十字架的长度
         length = int(min(x2 - x1, y2 - y1) * scale)
 
@@ -132,13 +134,30 @@ class Screen:
         return dimg
 
     def _draw_fps(self, image2draw_on: LightImage):
-
-        if len(self._interval_time) == 2:
-            self._interval_time.append(current_time())
-            interval = self._interval_time[-1] - self._interval_time[0]
+        """
+        取最近200次的时间间隔，计算平均fps，从而稳定FPS显示
+        Args:
+            image2draw_on: image to draw FPS
+        Returns: None
+        """
+        if self._pre == 0:
+            self._pre = current_time()
+        elif self._cur == 0:
+            self._cur = current_time()
+        else:
+            self._pre = self._cur
+            self._cur = current_time()
+            interval = self._cur - self._pre
+            if self._interval.__len__() < 200:
+                self._temp_sum += interval
+            elif self._interval.__len__() == 200:
+                self._temp_sum += interval
+                self._temp_sum -= self._interval.popleft()
+            self._interval.append(interval)
+            self.ave_fps = 1 / self._temp_sum * self._interval.__len__()
             cv2.putText(
                 image2draw_on.nd_arr,
-                f"fps = {1 / interval :.2f}",
+                f"FPS = {self.ave_fps :.2f}",
                 (10, 30),
                 cv2.FONT_HERSHEY_SIMPLEX,
                 1,

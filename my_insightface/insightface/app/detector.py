@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import cv2
+from line_profiler_pycharm import profile
 from numpy import ndarray
 
 from ..data import LightImage
@@ -38,6 +39,7 @@ class Detector:
                           'input_size': (320, 320)}
         self.detector_model.prepare(**prepare_params)
 
+    @profile
     def __call__(self, img2detect: LightImage) -> LightImage:
         detect_params = {'max_num': 0, 'metric': 'default'}
         bboxes, kpss = self.detector_model.detect(img2detect.nd_arr, **detect_params)

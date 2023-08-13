@@ -1,9 +1,13 @@
+import pickle
 import queue
 import subprocess
 from pathlib import Path
 from time import sleep
 
 import cv2
+import redis
+from line_profiler_pycharm import profile
+
 from ..data import LightImage
 
 
@@ -100,10 +104,12 @@ class Camera:
             "url": self._url,
         }
 
+    @profile
     def read_video(self, results: queue.Queue):
         from .multi_thread_analysis import threads_done
 
         print("camera_read start")
+        # redis_queue = redis.Redis(host="localhost", port=6379)
         try:
             while not threads_done.is_set():
                 ret, frame = self.videoCapture.read()
@@ -115,6 +121,11 @@ class Camera:
                             screen_scale=(0, 0, frame.shape[1] - 1, frame.shape[0] - 1),
                         )
                     )
+
+                    # serialized_light_image = pickle.dumps(LightImage(nd_arr=frame, faces=[], screen_scale=(
+                    #     0, 0, frame.shape[1] - 1, frame.shape[0] - 1), ))
+                    # redis_queue.rpush("video_2_show", serialized_light_image)
+
                     self._imgs_of_video += 1
                 else:
                     break

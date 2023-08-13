@@ -1,18 +1,44 @@
+from datetime import datetime
 from threading import Thread, Event
 from queue import Queue
+from time import sleep
 
+import redis
+from flask_socketio import SocketIO
+from line_profiler_pycharm import profile
+from werkzeug.serving import make_server
+
+from my_insightface.insightface.app.identifier import matched_and_in_screen_queue
 from performance_test import ave_fps_test
 from my_insightface.insightface.app.multi_thread_analysis import (
     MultiThreadFaceAnalysis,
-    COST_TIME,
+    COST_TIME, threads_done, streaming_event
 )
 from web.velzon.apps import create_app
 
 video_2_detect_queue = Queue(maxsize=400)
 detect_2_rec_queue = Queue(maxsize=200)
 rec_2_screen_queue = Queue(maxsize=400)
+flask_app = create_app()
+socketio = SocketIO(flask_app)
+data = []
 
 
+def update_data():
+    while True:
+        new_data = matched_and_in_screen_queue.get()
+        for item in new_data:
+            if item["ID"] not in [i["ID"] for i in data]:
+                new_item = {"ID": item["ID"], "Name": f"New {item['Name']}", "Identity": "Student",
+                            "Date": datetime.now().strftime("%d %b, %H:%M"), "Status": "Accessed"}
+                data.append(new_item)
+        for item in data:
+            if item["ID"] not in [i["ID"] for i in new_data]:
+                data.remove(item)
+        socketio.emit('update_data', data)
+
+
+@profile
 def whole_fps_test(
         resolution: tuple[int, int], fps: int
 ) -> tuple[tuple[str], tuple[str]]:
@@ -29,7 +55,7 @@ def whole_fps_test(
         camera_params=camera_params,
         identifier_params=identifier_params,
     )
-    flask_app = create_app()
+
     try:
         video_read_thread = Thread(target=test.video_read, args=(video_2_detect_queue,))
         detect_thread = Thread(
@@ -40,11 +66,22 @@ def whole_fps_test(
         )
         screen_2_web_thread = Thread(target=test.image2web, args=(rec_2_screen_queue,))
 
+        socketio.start_background_task(update_data)
+        flask_thread = Thread(target=socketio.run, args=(flask_app,),
+                              kwargs={"allow_unsafe_werkzeug": True, "debug": False})
+
         video_read_thread.start()
         detect_thread.start()
         identify_thread.start()
         screen_2_web_thread.start()
-        flask_app.run(debug=False)
+        flask_thread.start()
+
+        sleep(180)
+        print("sleep 180s")
+        socketio.stop()
+        threads_done.set()
+        streaming_event.clear()
+        print("shutdown flask_server")
         video_read_thread.join()
         detect_thread.join()
         identify_thread.join()
@@ -54,6 +91,9 @@ def whole_fps_test(
         print(f"Exception occurs, error = {e}")
         raise e
     finally:
+        socketio.stop()
+        threads_done.set()
+        streaming_event.clear()
         ave_fps = round(test.show_times / COST_TIME["image2web"][0], 1)
         if test.camera.params["fps"][0] == test.camera.params["fps"][1]:
             res_fps = (test.camera.params["fps"][0], ave_fps)

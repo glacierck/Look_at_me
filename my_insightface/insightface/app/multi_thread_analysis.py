@@ -5,6 +5,10 @@ from time import sleep
 import cv2
 from timeit import default_timer as current_time
 import functools
+
+import redis
+from line_profiler_pycharm import profile
+
 from .camera import Camera
 from .detector import Detector
 from .identifier import Identifier
@@ -60,7 +64,7 @@ class MultiThreadFaceAnalysis:
         print("video_read start")
         self.camera.read_video(jobs)
 
-    @cost_time_recording
+    @profile
     def image2detect(self, jobs: queue.Queue, results: queue.Queue):
         print("detect_thread start")
         while not threads_done.is_set():
@@ -74,7 +78,7 @@ class MultiThreadFaceAnalysis:
             image_2_show = self._detect(detect_job)
             results.put(image_2_show)
 
-    @cost_time_recording
+    @profile
     def detect2identify(self, jobs: queue.Queue, results: queue.Queue):
         print("detect2identify start")
         while not threads_done.is_set():
@@ -89,10 +93,11 @@ class MultiThreadFaceAnalysis:
                 print("detect2identify is empty")
                 break
 
-    @cost_time_recording
+    @profile
     def image2web(self, jobs: queue.Queue):
         print("image2web start")
         self.show_times = 0
+        image2web_redis = redis.Redis(host='localhost', port=6379)
         while not threads_done.is_set():
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 threads_done.set()
@@ -102,7 +107,10 @@ class MultiThreadFaceAnalysis:
                 to_web = self._screen.show(to_update)
                 # 没有请求之前不 捕获图像
                 if streaming_event.is_set():
-                    image2web_queue.put(to_web)
+                    _, buffer = cv2.imencode('.jpg', to_web)
+                    frame = buffer.tobytes()
+                    # 传入的是字节流
+                    image2web_redis.lpush("frames", frame)
                 else:
                     cv2.imshow("screen", to_web)
                 self.show_times += 1
@@ -110,13 +118,12 @@ class MultiThreadFaceAnalysis:
                 print("detect2identify is empty")
                 break
 
-    @cost_time_recording
+    @profile
     def image_show(self, jobs: queue.Queue):
         # from new_detector_fps import draw_bbox
         self.show_times = 0
         print("image_continued_show start")
-        fps_start = 0
-        fps_end = 0
+        # redis_queue = redis.Redis(host="localhost", port=6379)
         while not threads_done.is_set():
             start = current_time()
             if cv2.waitKey(1) & 0xFF == ord("q"):
@@ -125,18 +132,12 @@ class MultiThreadFaceAnalysis:
             try:
                 # print(f'finally_show_queue.qsize() = {jobs.qsize()}')
                 to_update = jobs.get(timeout=15)
-                if fps_end != 0:
-                    cv2.putText(
-                        to_update.nd_arr,
-                        f"fps = {1 / (fps_end - fps_start):.2f}",
-                        (10, 30),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        1,
-                        (0, 255, 0),
-                        2,
-                    )
-                fps_start = current_time()
-                self._screen.show(to_update)
+                # serialized_light_image = redis_queue.rpop("video_2_show")
+                # if serialized_light_image:
+                #     light_image = pickle.loads(serialized_light_image)
+
+                image2show_nd_arr = self._screen.show(to_update)
+                cv2.imshow('screen', image2show_nd_arr)
                 # draw_bbox(to_update)
                 self.show_times += 1
                 end_time = current_time()
@@ -146,7 +147,6 @@ class MultiThreadFaceAnalysis:
                 if sleep_time == 0:
                     print(f"Warning: sleep_time = {sleep_time}")
                 # sleep(sleep_time)
-                fps_end = current_time()
 
             except queue.Empty:
                 print("finally_show_queue is empty")

@@ -1,10 +1,12 @@
-import time
+from datetime import datetime
 
 import cv2
+import redis
 from flask import Blueprint, render_template, current_app, Response
 from flask_login import login_required, current_user
+from line_profiler_pycharm import profile
 
-from my_insightface.insightface.app.multi_thread_analysis import streaming_event, image2web_queue, threads_done
+from my_insightface.insightface.app.multi_thread_analysis import streaming_event
 
 dashboards = Blueprint(
     "dashboards",
@@ -33,16 +35,16 @@ def dashboard_crm():
     return render_template("dashboards/dashboard-crm.html")
 
 
+@profile
 def generate():
+    image2web_redis = redis.Redis(host='localhost', port=6379)
     while True:
         # print("image2web_queue.qsize() = ", image2web_queue.qsize())
         # print("streaming_event.is_set() = ", streaming_event.is_set())
-        if streaming_event.is_set() and not image2web_queue.empty():  # 只有在有客户端请求时才获取图像
-            frame = image2web_queue.get()
-            _, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
+        frame_bytes = image2web_redis.rpop("frames")
+        if streaming_event.is_set() and frame_bytes:  # 只有在有客户端请求时才获取图像
             yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
         # time.sleep(0.1)  # 控制获取速度
         # elif image2web_queue.empty():
         #     print("image2web_queue is empty")
@@ -50,6 +52,7 @@ def generate():
 
 @dashboards.route("/video_feed")
 @login_required
+@profile
 def video_feed():
     streaming_event.set()  # 客户端开始请求，设置事件
     response = Response(

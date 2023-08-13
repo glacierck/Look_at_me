@@ -1,12 +1,18 @@
 import heapq
+import queue
 from pathlib import Path
 
 import numpy as np
+import redis
+from line_profiler_pycharm import profile
 
 from database.milvus_standalone.common import MatchInfo
 from .common import Face, RawTarget, Target
+
 from .sort_plus import associate_detections_to_trackers
 from ..data import LightImage
+
+matched_and_in_screen_queue = queue.Queue(maxsize=-1)
 
 
 class Extractor:
@@ -60,13 +66,17 @@ class Identifier:
             self._milvus.load2RAM()
         self._frame_cnt = 1
 
-        # test insert val
-        self._test_ids = np.random.choice(range(100000), 1000, replace=False).tolist()
-        self._test_names = (np.random.choice(range(100000), 1000, replace=False)).tolist()
-        test_embeddings = np.random.uniform(0.1, 1, (1000, 512))
-        norms = np.linalg.norm(test_embeddings, axis=1, keepdims=True)
-        self._test_embeddings = (test_embeddings / norms).tolist()
+        # # 不用队列，因为队列删除不了指定元素
+        # self._matched_and_in_screen = set()
 
+        # # test insert val
+        # self._test_ids = np.random.choice(range(100000), 1000, replace=False).tolist()
+        # self._test_names = (np.random.choice(range(100000), 1000, replace=False)).tolist()
+        # test_embeddings = np.random.uniform(0.1, 1, (1000, 512))
+        # norms = np.linalg.norm(test_embeddings, axis=1, keepdims=True)
+        # self._test_embeddings = (test_embeddings / norms).tolist()
+
+    @profile
     def identified_results(self, image2identify: LightImage) -> LightImage:
         self._update(image2identify)
         self._extract(image2identify)
@@ -77,15 +87,21 @@ class Identifier:
         #                               self._test_embeddings.pop())
         self._search()
         image2identify.faces.clear()
+        matched_and_in_screen = []
         for i, target in enumerate(self._targets.values()):
             if not target.in_screen(self.min_hits):
                 continue
-
+            # 没有匹配到
             if target.match_info.face_id == -1:
                 match_info = MatchInfo(face_id=-1, name=target.name, score=0.0)
                 target.match_info = match_info
+            else:
+                matched_and_in_screen.append({"ID": target.id, "Name": target.name})
             image2identify.faces.append(
                 [target.bbox, target.kps, target.score, target.colors, target.match_info])
+
+        self._send2web(matched_and_in_screen)
+
         if self._frame_cnt < 100000:
             self._frame_cnt += 1
         else:
@@ -94,6 +110,21 @@ class Identifier:
 
     def stop_milvus(self):
         self._milvus.stop_milvus()
+
+    def _send2web(self, new_targets: list[dict]):
+        from .multi_thread_analysis import streaming_event
+        if streaming_event.is_set():
+            matched_and_in_screen_queue.put(new_targets)
+        else:
+            matched_and_in_screen_queue.queue.clear()
+        # for new_target in new_targets:
+        #     if new_target not in self._matched_and_in_screen:
+        #         new_item_queue.put(new_target)
+        # for old_target in self._matched_and_in_screen:
+        #     if old_target not in new_targets:
+        #         old_item_queue.put(old_target)
+        # # 更新
+        # self._matched_and_in_screen = set(new_targets)
 
     def _update(self, image2update: LightImage):
         # 更新目标
