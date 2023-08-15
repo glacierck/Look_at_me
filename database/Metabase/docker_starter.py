@@ -11,10 +11,12 @@ from pathlib import Path
 
 
 def docker_start():
+    print("正在启动 Docker 容器...")
     client = docker.from_env()
 
     # 检查 Docker 权限
     try:
+        print("正在检查 Docker 权限...")
         client.ping()
     except docker.errors.APIError as e:
         raise Exception("无法访问 Docker API。请确保您具有正确的 Docker 权限。") from e
@@ -22,7 +24,8 @@ def docker_start():
     # 检查 Docker 引擎
     if not client.ping():
         raise Exception("无法访问 Docker 引擎。请确保 Docker 引擎正在运行。")
-
+    print("Docker 引擎正常运行。")
+    print("正在检查 Docker 镜像...")
     # 检查文件路径
     host_dir = Path("D:\\Users\\Atticus\\OneDrive\\CXXY\\Competition\\DC\\FR_pj\\Look_at_me\\database\\sqlite3")
     if not host_dir.is_dir() and not host_dir.exists():
@@ -31,6 +34,7 @@ def docker_start():
     # 检查镜像
     image_name = "metabase/metabase"
     try:
+        print(f"正在检查 Docker 镜像：{image_name}...")
         client.images.get(image_name)
     except docker.errors.ImageNotFound:
         raise f"无法找到 Docker 镜像：{image_name}"

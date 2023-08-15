@@ -15,4 +15,14 @@ from ..models import Permission
 
 @dashboards.app_context_processor
 def inject_permissions():
-    return {'Permission': Permission, 'current_user': current_user}
+    subjectsData = {
+        "Math": 95,
+        "English": 85,
+        "Physics": 98,
+        "Chemistry": 90,
+        "Biology": 85,
+        "History": 65,
+        "Geography": 75
+
+    }
+    return {'Permission': Permission, 'current_user': current_user, 'subjectsData': subjectsData}

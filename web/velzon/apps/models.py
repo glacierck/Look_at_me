@@ -54,6 +54,15 @@ class Role(db.Model):
         if self.permissions is None:
             self.permissions = 0
 
+    @property
+    def real_time_status(self):
+        if self.name == "Administrator":
+            total = len(User.query.all())
+            in_school = len(User.query.filter_by(position=True).all())
+            out_school = total - in_school
+            percentage = round(in_school / total * 100, 2)
+            return {"total": total, "in_school": in_school, "out_school": out_school, "percentage": percentage}
+
     @staticmethod
     def insert_roles():
         roles = {
@@ -268,6 +277,10 @@ class User(db.Model, UserMixin):
         return self.username[:2]
 
     @property
+    def identity(self):
+        return self.roles[0].name
+
+    @identity.getter
     def identity(self):
         return self.roles[0].name
 
