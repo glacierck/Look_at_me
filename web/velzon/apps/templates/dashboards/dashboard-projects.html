@@ -57,7 +57,7 @@
                                             <div class="col-6 col-sm-3">
                                                 <div class="p-3 border border-dashed border-start-0">
                                                     <h5 class="mb-1"><span class="counter-value"
-                                                                           data-target="{{ current_user.roles[0].real_time_status["total"] }}">0</span>
+                                                                           data-target="total">0</span>
                                                     </h5>
                                                     <p class="text-muted mb-0">Number of Staff</p>
                                                 </div>
@@ -66,7 +66,7 @@
                                             <div class="col-6 col-sm-3">
                                                 <div class="p-3 border border-dashed border-start-0">
                                                     <h5 class="mb-1"><span class="counter-value"
-                                                                           data-target="{{ current_user.roles[0].real_time_status["in_school"] }}">0</span>
+                                                                           data-target="in_school">0</span>
                                                     </h5>
                                                     <p class="text-muted mb-0">Within school</p>
                                                 </div>
@@ -75,7 +75,7 @@
                                             <div class="col-6 col-sm-3">
                                                 <div class="p-3 border border-dashed border-start-0">
                                                     <h5 class="mb-1"><span class="counter-value"
-                                                                           data-target="{{ current_user.roles[0].real_time_status["out_school"] }}"></span>
+                                                                           data-target="out_school"></span>
                                                     </h5>
                                                     <p class="text-muted mb-0">Outside school</p>
                                                 </div>
@@ -84,7 +84,7 @@
                                             <div class="col-6 col-sm-3">
                                                 <div class="p-3 border border-dashed border-start-0 border-end-0">
                                                     <h5 class="mb-1 text-success"><span class="counter-value"
-                                                                                        data-target="{{ current_user.roles[0].real_time_status["percentage"] }}">0</span>%
+                                                                                        data-target="percentage">0</span>
                                                     </h5>
                                                     <p class="text-muted mb-0">Within percentage</p>
                                                 </div>
@@ -119,10 +119,10 @@
                                             <div class="flex-shrink-0">
                                                 <img src="/static/images/users/avatar-3.jpg" alt=""
                                                      class="avatar-xs rounded-circle"/>
-                                                </div>
+                                            </div>
                                             <div class="flex-grow-1">
                                                 Jordan Kennedy
-                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                     <td>Student</td>
@@ -138,7 +138,7 @@
                                 <a class="text-success"><i
                                         class="mdi mdi-loading mdi-spin fs-20 align-middle me-2"></i>
                                     Load more </a>
-                                </div>
+                            </div>
                         </div>
 
                         <!-- end table responsive -->
@@ -160,84 +160,6 @@
                             </div><!-- end card-body -->
                         </div><!-- end card -->
                     </div>
-
-
-                    {#                    <div class="col-xxl-4 col-lg-6">#}
-                    {#                        <div class="card card-height-100">#}
-                    {#                            <div class="card-header align-items-center d-flex">#}
-                    {#                                <h4 class="card-title mb-0 flex-grow-1">Projects Status</h4>#}
-                    {#                                <div class="flex-shrink-0">#}
-                    {#                                    <div class="dropdown card-header-dropdown">#}
-                    {#                                        <a class="dropdown-btn text-muted" href="#" data-bs-toggle="dropdown"#}
-                    {#                                           aria-haspopup="true" aria-expanded="false">#}
-                    {#                                            All Time <i class="mdi mdi-chevron-down ms-1"></i>#}
-                    {#                                        </a>#}
-                    {#                                        <div class="dropdown-menu dropdown-menu-end">#}
-                    {#                                            <a class="dropdown-item" href="#">All Time</a>#}
-                    {#                                            <a class="dropdown-item" href="#">Last 7 Days</a>#}
-                    {#                                            <a class="dropdown-item" href="#">Last 30 Days</a>#}
-                    {#                                            <a class="dropdown-item" href="#">Last 90 Days</a>#}
-                    {#                                        </div>#}
-                    {#                                    </div>#}
-                    {#                                </div>#}
-                    {#                            </div><!-- end card header -->#}
-                    {##}
-                    {#                            <div class="card-body">#}
-                    {#                                <div id="prjects-status"#}
-                    {#                                     data-colors='["--vz-primary", "--vz-primary-rgb, 0.85", "--vz-primary-rgb, 0.70", "--vz-primary-rgb, 0.50"]'#}
-                    {#                                     class="apex-charts" dir="ltr"></div>#}
-                    {#                                <div class="mt-3">#}
-                    {#                                    <div class="d-flex justify-content-center align-items-center mb-4">#}
-                    {#                                        <h2 class="me-3 ff-secondary mb-0">258</h2>#}
-                    {#                                        <div>#}
-                    {#                                            <p class="text-muted mb-0">Total Projects</p>#}
-                    {#                                            <p class="text-success fw-medium mb-0">#}
-                    {#                                                <span class="badge bg-success-subtle text-success p-1 rounded-circle"><i#}
-                    {#                                                        class="ri-arrow-right-up-line"></i></span> +3 New#}
-                    {#                                            </p>#}
-                    {#                                        </div>#}
-                    {#                                    </div>#}
-                    {##}
-                    {#                                    <div class="d-flex justify-content-between border-bottom border-bottom-dashed py-2">#}
-                    {#                                        <p class="fw-medium mb-0"><i#}
-                    {#                                                class="ri-checkbox-blank-circle-fill text-success align-middle me-2"></i>#}
-                    {#                                            Completed</p>#}
-                    {#                                        <div>#}
-                    {#                                            <span class="text-muted pe-5">125 Projects</span>#}
-                    {#                                            <span class="text-success fw-medium fs-12">15870hrs</span>#}
-                    {#                                        </div>#}
-                    {#                                    </div><!-- end -->#}
-                    {#                                    <div class="d-flex justify-content-between border-bottom border-bottom-dashed py-2">#}
-                    {#                                        <p class="fw-medium mb-0"><i#}
-                    {#                                                class="ri-checkbox-blank-circle-fill text-primary align-middle me-2"></i>#}
-                    {#                                            In Progress</p>#}
-                    {#                                        <div>#}
-                    {#                                            <span class="text-muted pe-5">42 Projects</span>#}
-                    {#                                            <span class="text-success fw-medium fs-12">243hrs</span>#}
-                    {#                                        </div>#}
-                    {#                                    </div><!-- end -->#}
-                    {#                                    <div class="d-flex justify-content-between border-bottom border-bottom-dashed py-2">#}
-                    {#                                        <p class="fw-medium mb-0"><i#}
-                    {#                                                class="ri-checkbox-blank-circle-fill text-warning align-middle me-2"></i>#}
-                    {#                                            Yet to Start</p>#}
-                    {#                                        <div>#}
-                    {#                                            <span class="text-muted pe-5">58 Projects</span>#}
-                    {#                                            <span class="text-success fw-medium fs-12">~2050hrs</span>#}
-                    {#                                        </div>#}
-                    {#                                    </div><!-- end -->#}
-                    {#                                    <div class="d-flex justify-content-between py-2">#}
-                    {#                                        <p class="fw-medium mb-0"><i#}
-                    {#                                                class="ri-checkbox-blank-circle-fill text-danger align-middle me-2"></i>#}
-                    {#                                            Cancelled</p>#}
-                    {#                                        <div>#}
-                    {#                                            <span class="text-muted pe-5">89 Projects</span>#}
-                    {#                                            <span class="text-success fw-medium fs-12">~900hrs</span>#}
-                    {#                                        </div>#}
-                    {#                                    </div><!-- end -->#}
-                    {#                                </div>#}
-                    {#                            </div><!-- end cardbody -->#}
-                    {#                        </div><!-- end card -->#}
-                    {#                    </div><!-- end col -->#}
                 </div><!-- end row -->
 
             </div>
@@ -276,53 +198,75 @@
     <script src="{{ url_for('static' ,filename='js/pages/dashboard-projects.init.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
-
-    <script>
-        var socket = io.connect(window.location.origin);
-
-        socket.on('connect', function () {
-            console.log('Connected to the server');
-        });
-
-        socket.on('connect_error', function (error) {
-            console.log('Connect Error:', error);
-        });
-
-        socket.on('connect_timeout', function () {
-            console.log('Connection Timeout');
-        });
-
-        socket.on('update_chart', function (data) {
-            console.log("update_chart event received");
-            updateChart(data);
-        });
-
-        function updateChart(data) {
-            console.log("Received data:", data);  // 打印接收到的数据
-
-            // 合并现有数据和接收到的数据
-            for (let key in data) {
-                subjectsData[key] = data[key];
-            }
-
-            // 使用完整的 subjectsData 更新 ApexCharts 图表的数据
-            chart.updateSeries([{
-                name: "Scores",
-                data: Object.values(subjectsData)
-            }]);
-            chart.updateOptions({
-                xaxis: {
-                    categories: Object.keys(subjectsData)
-                }
-            });
-        }
-
-
-    </script>
+    {#    <script>#}
+    {#        document.addEventListener('DOMContentLoaded', (event) => {#}
+    {#            var socket = io.connect(window.location.origin);#}
+    {##}
+    {#            // 用于更新特定字段的函数#}
+    {#            function updateFields(data) {#}
+    {#                // 更新"total"字段#}
+    {#                document.querySelector('[data-target="total"]').innerText = data.total;#}
+    {#                // 更新"in_school"字段#}
+    {#                document.querySelector('[data-target="in_school"]').innerText = data.in_school;#}
+    {#                // 更新"out_school"字段#}
+    {#                document.querySelector('[data-target="out_school"]').innerText = data.out_school;#}
+    {#                // 更新"percentage"字段#}
+    {#                document.querySelector('[data-target="percentage"]').innerText = data.percentage + '%';#}
+    {#            }#}
+    {##}
+    {#            // 当收到后端的数据更新时，调用updateFields函数#}
+    {#            socket.on('update_data', function (data) {#}
+    {#                updateFields(data);#}
+    {#            });#}
+    {#        });#}
+    {##}
+    {#    </script>#}
+    {#    <script>#}
+    {#        var socket = io.connect(window.location.origin);#}
+    {##}
+    {#        socket.on('connect', function () {#}
+    {#            console.log('Connected to the server');#}
+    {#        });#}
+    {##}
+    {#        socket.on('connect_error', function (error) {#}
+    {#            console.log('Connect Error:', error);#}
+    {#        });#}
+    {##}
+    {#        socket.on('connect_timeout', function () {#}
+    {#            console.log('Connection Timeout');#}
+    {#        });#}
+    {##}
+    {#        socket.on('update_chart', function (data) {#}
+    {#            console.log("update_chart event received");#}
+    {#            updateChart(data);#}
+    {#        });#}
+    {##}
+    {#        function updateChart(data) {#}
+    {#            console.log("Received data:", data);  // 打印接收到的数据#}
+    {##}
+    {#            // 合并现有数据和接收到的数据#}
+    {#            for (let key in data) {#}
+    {#                subjectsData[key] = data[key];#}
+    {#            }#}
+    {##}
+    {#            // 使用完整的 subjectsData 更新 ApexCharts 图表的数据#}
+    {#            chart.updateSeries([{#}
+    {#                name: "Scores",#}
+    {#                data: Object.values(subjectsData)#}
+    {#            }]);#}
+    {#            chart.updateOptions({#}
+    {#                xaxis: {#}
+    {#                    categories: Object.keys(subjectsData)#}
+    {#                }#}
+    {#            });#}
+    {#        }#}
+    {##}
+    {##}
+    {#    </script>#}
 
     {#    <script>#}
     {#        document.addEventListener('DOMContentLoaded', (event) => {#}
-    {#            var socket = io.connect('http://' + document.domain + ':' + location.port);#}
+    {#            var socket = io.connect(window.location.origin);#}
     {##}
     {#            // 更新表格的函数#}
     {#            function updateTable(data) {#}
@@ -332,19 +276,19 @@
     {#                data.forEach(function (item) {#}
     {#                    var row = tbody.insertRow();#}
     {#                    row.innerHTML = `<td><a class="fw-semibold">${item.ID}</a></td>#}
-    {#                                 <td>#}
-    {#                                     <div class="d-flex gap-2 align-items-center">#}
-    {#                                         <div class="flex-shrink-0">#}
-    {#                                             <img src="/static/images/users/avatar-3.jpg" alt="" class="avatar-xs rounded-circle" />#}
+    {#                                     <td>#}
+    {#                                         <div class="d-flex gap-2 align-items-center">#}
+    {#                                             <div class="flex-shrink-0">#}
+    {#                                                 <img src="/static/images/users/avatar-3.jpg" alt="" class="avatar-xs rounded-circle" />#}
+    {#                                             </div>#}
+    {#                                             <div class="flex-grow-1">#}
+    {#                                                 ${item.Name}#}
+    {#                                             </div>#}
     {#                                         </div>#}
-    {#                                         <div class="flex-grow-1">#}
-    {#                                             ${item.Name}#}
-    {#                                         </div>#}
-    {#                                     </div>#}
-    {#                                 </td>#}
-    {#                                 <td>${item.Identity}</td>#}
-    {#                                 <td>${item.Date}</td>#}
-    {#                                 <td class="text-success"><i class="ri-checkbox-circle-line fs-17 align-middle"></i> ${item.Status}</td>`;#}
+    {#                                     </td>#}
+    {#                                     <td>${item.Identity}</td>#}
+    {#                                     <td>${item.Date}</td>#}
+    {#                                     <td class="text-success"><i class="ri-checkbox-circle-line fs-17 align-middle"></i> ${item.Status}</td>`;#}
     {#                });#}
     {#            }#}
     {##}
@@ -354,4 +298,91 @@
     {#            });#}
     {#        });#}
     {#    </script>#}
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            var socket = io.connect(window.location.origin);
+
+            function updateFields(data) {
+                // 更新"total"字段
+                document.querySelector('[data-target="total"]').innerText = data.total;
+                // 更新"in_school"字段
+                document.querySelector('[data-target="in_school"]').innerText = data.in_school;
+                // 更新"out_school"字段
+                document.querySelector('[data-target="out_school"]').innerText = data.out_school;
+                // 更新"percentage"字段
+                document.querySelector('[data-target="percentage"]').innerText = data.percentage + '%';
+            }
+
+            function updateTable(updateInfo) {
+                var tbody = document.querySelector(".table-responsive tbody");
+
+                // 删除旧的项目
+                var deletedRow = document.getElementById(updateInfo.deleted.ID);
+                if (deletedRow) {
+                    deletedRow.remove();
+                }
+
+                // 添加新的项目
+                var row = tbody.insertRow();
+                row.id = updateInfo.added.ID;
+                row.innerHTML = `<td><a class="fw-semibold">${updateInfo.added.ID}</a></td>
+                     <td>
+                         <div class="d-flex gap-2 align-items-center">
+                             <div class="flex-shrink-0">
+                                 <img src="/static/images/users/avatar-3.jpg" alt="" class="avatar-xs rounded-circle" />
+                             </div>
+                             <div class="flex-grow-1">
+                                 ${updateInfo.added.Name}
+                             </div>
+                         </div>
+                     </td>
+                     <td>${updateInfo.added.Identity}</td>
+                     <td>${updateInfo.added.Date}</td>
+                     <td class="text-success"><i class="ri-checkbox-circle-line fs-17 align-middle"></i> ${updateInfo.added.Status}</td>`;
+            }
+
+            function updateChart(data) {
+                console.log("Received data:", data);  // 打印接收到的数据
+
+                // 合并现有数据和接收到的数据
+                for (let key in data) {
+                    subjectsData[key] = data[key];
+                }
+
+                // 使用完整的 subjectsData 更新 ApexCharts 图表的数据
+                chart.updateSeries([{
+                    name: "Scores",
+                    data: Object.values(subjectsData)
+                }]);
+                chart.updateOptions({
+                    xaxis: {
+                        categories: Object.keys(subjectsData)
+                    }
+                });
+            }
+
+            socket.on('connect', function () {
+                console.log('Connected to the server');
+            });
+
+            socket.on('connect_error', function (error) {
+                console.log('Connect Error:', error);
+            });
+
+            socket.on('connect_timeout', function () {
+                console.log('Connection Timeout');
+            });
+
+            socket.on('update_table', function (data) {
+                updateTable(data);
+            });
+            socket.on('update_field', function (data) {
+                updateFields(data);
+            });
+            socket.on('update_chart', function (data) {
+                updateChart(data);
+            });
+        });
+
+    </script>
 {% endblock extra_js %}
