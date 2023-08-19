@@ -1,8 +1,9 @@
 from pathlib import Path
-
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, render_template
 from flask_login import LoginManager
+
+
 
 db = SQLAlchemy()
 
@@ -39,6 +40,7 @@ def create_app():
     login_manager.session_protection = "strong"
     login_manager.login_view = "authentication.login"  # set the login view
     from .models import User
+
 
     @login_manager.user_loader
     def load_user(user_id):

@@ -1,0 +1,8 @@
+version: '3.1'
+services:
+  my_flask_app:
+    build: database/milvus_standalone
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app

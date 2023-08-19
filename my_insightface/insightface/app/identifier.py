@@ -1,3 +1,4 @@
+import collections
 import heapq
 import queue
 from pathlib import Path
@@ -12,7 +13,7 @@ from .common import Face, RawTarget, Target
 from .sort_plus import associate_detections_to_trackers
 from ..data import LightImage
 
-matched_and_in_screen_queue = queue.Queue(maxsize=-1)
+matched_and_in_screen_deque = collections.deque(maxlen=10)
 
 
 class Extractor:
@@ -114,17 +115,8 @@ class Identifier:
     def _send2web(self, new_targets: list[dict]):
         from .multi_thread_analysis import streaming_event
         if streaming_event.is_set():
-            matched_and_in_screen_queue.put(new_targets)
-        else:
-            matched_and_in_screen_queue.queue.clear()
-        # for new_target in new_targets:
-        #     if new_target not in self._matched_and_in_screen:
-        #         new_item_queue.put(new_target)
-        # for old_target in self._matched_and_in_screen:
-        #     if old_target not in new_targets:
-        #         old_item_queue.put(old_target)
-        # # 更新
-        # self._matched_and_in_screen = set(new_targets)
+            matched_and_in_screen_deque.append(new_targets)
+
 
     def _update(self, image2update: LightImage):
         # 更新目标

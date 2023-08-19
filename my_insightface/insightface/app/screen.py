@@ -25,12 +25,12 @@ class Screen:
         if self._frame_cnt > 10000:
             self._frame_cnt = 0
         image2show_nd_arr = self.resize_image(self._draw_on(image2show))
-
+        res = self._draw_fps(image2show_nd_arr)
         # cv2.imshow('screen', image2show_nd_arr)
-        return image2show_nd_arr
+        return res
 
     @staticmethod
-    def resize_image(image2resize: ndarray, target_size=(1056, 458)) -> ndarray:
+    def resize_image(image2resize: ndarray, target_size=(1080, 560)) -> ndarray:
         """
         cv2.INTER_AREA：区域插值 效果最好，但速度慢
         cv2.INTER_CUBIC ：三次样条插值，效率居中
@@ -133,7 +133,7 @@ class Screen:
 
         return dimg
 
-    def _draw_fps(self, image2draw_on: LightImage):
+    def _draw_fps(self, image2show_nd_arr: ndarray):
         """
         取最近200次的时间间隔，计算平均fps，从而稳定FPS显示
         Args:
@@ -156,7 +156,7 @@ class Screen:
             self._interval.append(interval)
             self.ave_fps = 1 / self._temp_sum * self._interval.__len__()
             cv2.putText(
-                image2draw_on.nd_arr,
+                image2show_nd_arr,
                 f"FPS = {self.ave_fps :.2f}",
                 (10, 30),
                 cv2.FONT_HERSHEY_SIMPLEX,
@@ -164,10 +164,10 @@ class Screen:
                 (0, 255, 0),
                 2,
             )
-
+        return image2show_nd_arr
     def _draw_on(self, image2draw_on: LightImage):
         dimg = image2draw_on.nd_arr
-        self._draw_fps(image2draw_on)
+
         for face in image2draw_on.faces:
             # face=[bbox, kps, det_score, color, match_info]
             bbox = face[0].astype(int)

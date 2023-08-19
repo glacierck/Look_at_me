@@ -2,20 +2,23 @@ import time
 
 import cv2
 import numpy as np
+from line_profiler_pycharm import profile
 
 from my_insightface.insightface.utils.my_tools import detect_cameras
 
-
+@profile
 def get_FOURCC(*resolution):
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture('http://localhost:8080/video')
+
 
     #  设置帧数
     cap.set(cv2.CAP_PROP_FPS, 30)
-
-    # 设置分辨率
+    # # 设置分辨率
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, int(resolution[0]))
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, int(resolution[1]))
     cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter.fourcc("M", "J", "P", "G"))
+
+
     get_fps = int(cap.get(cv2.CAP_PROP_FPS))
 
     fourcc = cap.get(cv2.CAP_PROP_FOURCC)
@@ -58,7 +61,7 @@ def replace_emoji_with_entity(html):
 
 def main():
     # detect_cameras()
-    get_FOURCC(1920, 1080)
+    get_FOURCC(2592, 1944)
 
 
 if __name__ == "__main__":

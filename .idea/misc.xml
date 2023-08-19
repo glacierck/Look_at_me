@@ -7,4 +7,7 @@
     <option name="pathToExecutable" value="D:\Users\Atticus\anaconda3\Scripts\black.exe" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Integrated 3.11.4" project-jdk-type="Python SDK" />
+  <component name="PyPackaging">
+    <option name="earlyReleasesAsUpgrades" value="true" />
+  </component>
 </project>

@@ -63,8 +63,8 @@ class Camera:
                 # 如果有输出，打印出来
                 if stdout:
                     print("STDOUT:{}".format(stdout))
-                if stderr:
-                    raise ValueError("STDERR:{}".format(stderr))
+                # if stderr:
+                #     raise ValueError("STDERR:{}".format(stderr))
             case ["ip_webcam", "wifi"]:
                 self._url = "http://192.168.0.103:8080/video"
             case _:
@@ -103,7 +103,7 @@ class Camera:
             "resolution": self._resolution,
             "url": self._url,
         }
-
+        print(f"camera params = {self.params}")
     @profile
     def read_video(self, results: queue.Queue):
         from .multi_thread_analysis import threads_done

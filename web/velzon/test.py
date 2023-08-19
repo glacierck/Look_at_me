@@ -7,7 +7,7 @@ from apps import create_app
 # 初始化20个数据
 data = [
     {"ID": f"VZ21{i:02}", "Name": f"User {i}", "Identity": "Student", "Date": datetime.now().strftime("%d %b, %H:%M"),
-     "Status": "Paid"} for i in range(500)]
+     "Status": "Paid"} for i in range(10)]
 
 app = create_app()
 socketio = SocketIO(app)
@@ -41,26 +41,31 @@ def update_data():
     # 每1秒随机删除一些数据并添加新数据
     while True:
         socketio.sleep(1)
-
-        deleted_item = data.pop(random.randint(0, len(data) - 1))
-        # 随机选择一个学科作为学生的学科
-        subject_name = random.choice(list(SUBJECTS_ABBREVIATIONS.keys()))
-
-        # 更新学科的人数
-        subjects_count[subject_name] += 1
-
-        # 创建学生的ID
-        student_id = f"{SUBJECTS_ABBREVIATIONS[subject_name]}21{random.randint(1, 9)}{random.randint(0, 99)}"
-
-        new_item = {
-            "ID": student_id,
-            "Name": student_id,
-            "Identity": "Student",
-            "Date": datetime.now().strftime("%d %b, %H:%M"),
-            "Status": "Paid"
-        }
-        data.append(new_item)
-        update_info = {"deleted": deleted_item, "added": new_item}
+        new_items= []
+        deleted_items = []
+        for _ in range(random.randint(1, 5)):
+            # 随机删除一个学生
+            if len(data) <2:
+                break
+            deleted_item = data.pop(random.randint(0, len(data) - 1))
+            deleted_items.append(deleted_item)
+        for _ in range(random.randint(1, 5)):
+            # 随机选择一个学科作为学生的学科
+            subject_name = random.choice(list(SUBJECTS_ABBREVIATIONS.keys()))
+            # 更新学科的人数
+            subjects_count[subject_name] += 1
+            # 创建学生的ID
+            student_id = f"{SUBJECTS_ABBREVIATIONS[subject_name]}21{random.randint(1, 9)}{random.randint(0, 99)}"
+            new_item = {
+                "ID": student_id,
+                "Name": student_id,
+                "Identity": "Student",
+                "Date": datetime.now().strftime("%d %b, %H:%M"),
+                "Status": "Paid"
+            }
+            new_items.append(new_item)
+            data.append(new_item)
+        update_info = {"deleted": deleted_items, "added": new_items}
         socketio.emit('update_table', update_info)
 
 
@@ -113,7 +118,7 @@ def handle_connection():
 
 def main():
     # 启动更新数据线程
-    socketio.run(app, port=8080, debug=True)
+    socketio.run(app, port=8088, debug=True)
 
 
 if __name__ == '__main__':

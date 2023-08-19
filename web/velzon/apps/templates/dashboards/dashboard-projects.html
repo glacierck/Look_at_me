@@ -92,7 +92,8 @@
                                             <!--end col-->
                                         </div>
                                     </div><!-- end card header -->
-                                    {#                                    <img src="{{ url_for('dashboards.video_feed') }}" alt="test">#}
+                                    <img id="videoFeed" src="" alt="test">
+                                    {#                                    <img src="{{ url_for("dashboards.video_feed") }}" alt="test">#}
                                     <!-- end card body -->
                                 </div><!-- end card -->
                             </div><!-- end col -->
@@ -185,7 +186,7 @@
     <!-- for irregular timeseries chart -->
     <script src="https://img.themesbrand.com/velzon/apexchart-js/irregular-data-series.js"></script>
 
-    <script src="{{ url_for('static' ,filename='libs/moment/moment.js') }}"></script>
+    {#    <script src="{{ url_for('static' ,filename='libs/moment/moment.js') }}"></script>#}
     {#    <script>#}
     {#        var subjectsData = '{{ subjectsData | tojson | safe }}';#}
     {#    </script>#}
@@ -198,109 +199,21 @@
     <script src="{{ url_for('static' ,filename='js/pages/dashboard-projects.init.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
-    {#    <script>#}
-    {#        document.addEventListener('DOMContentLoaded', (event) => {#}
-    {#            var socket = io.connect(window.location.origin);#}
-    {##}
-    {#            // 用于更新特定字段的函数#}
-    {#            function updateFields(data) {#}
-    {#                // 更新"total"字段#}
-    {#                document.querySelector('[data-target="total"]').innerText = data.total;#}
-    {#                // 更新"in_school"字段#}
-    {#                document.querySelector('[data-target="in_school"]').innerText = data.in_school;#}
-    {#                // 更新"out_school"字段#}
-    {#                document.querySelector('[data-target="out_school"]').innerText = data.out_school;#}
-    {#                // 更新"percentage"字段#}
-    {#                document.querySelector('[data-target="percentage"]').innerText = data.percentage + '%';#}
-    {#            }#}
-    {##}
-    {#            // 当收到后端的数据更新时，调用updateFields函数#}
-    {#            socket.on('update_data', function (data) {#}
-    {#                updateFields(data);#}
-    {#            });#}
-    {#        });#}
-    {##}
-    {#    </script>#}
-    {#    <script>#}
-    {#        var socket = io.connect(window.location.origin);#}
-    {##}
-    {#        socket.on('connect', function () {#}
-    {#            console.log('Connected to the server');#}
-    {#        });#}
-    {##}
-    {#        socket.on('connect_error', function (error) {#}
-    {#            console.log('Connect Error:', error);#}
-    {#        });#}
-    {##}
-    {#        socket.on('connect_timeout', function () {#}
-    {#            console.log('Connection Timeout');#}
-    {#        });#}
-    {##}
-    {#        socket.on('update_chart', function (data) {#}
-    {#            console.log("update_chart event received");#}
-    {#            updateChart(data);#}
-    {#        });#}
-    {##}
-    {#        function updateChart(data) {#}
-    {#            console.log("Received data:", data);  // 打印接收到的数据#}
-    {##}
-    {#            // 合并现有数据和接收到的数据#}
-    {#            for (let key in data) {#}
-    {#                subjectsData[key] = data[key];#}
-    {#            }#}
-    {##}
-    {#            // 使用完整的 subjectsData 更新 ApexCharts 图表的数据#}
-    {#            chart.updateSeries([{#}
-    {#                name: "Scores",#}
-    {#                data: Object.values(subjectsData)#}
-    {#            }]);#}
-    {#            chart.updateOptions({#}
-    {#                xaxis: {#}
-    {#                    categories: Object.keys(subjectsData)#}
-    {#                }#}
-    {#            });#}
-    {#        }#}
-    {##}
-    {##}
-    {#    </script>#}
-
-    {#    <script>#}
-    {#        document.addEventListener('DOMContentLoaded', (event) => {#}
-    {#            var socket = io.connect(window.location.origin);#}
-    {##}
-    {#            // 更新表格的函数#}
-    {#            function updateTable(data) {#}
-    {#                var tbody = document.querySelector(".table-responsive tbody");#}
-    {#                tbody.innerHTML = ""; // 清空现有数据#}
-    {##}
-    {#                data.forEach(function (item) {#}
-    {#                    var row = tbody.insertRow();#}
-    {#                    row.innerHTML = `<td><a class="fw-semibold">${item.ID}</a></td>#}
-    {#                                     <td>#}
-    {#                                         <div class="d-flex gap-2 align-items-center">#}
-    {#                                             <div class="flex-shrink-0">#}
-    {#                                                 <img src="/static/images/users/avatar-3.jpg" alt="" class="avatar-xs rounded-circle" />#}
-    {#                                             </div>#}
-    {#                                             <div class="flex-grow-1">#}
-    {#                                                 ${item.Name}#}
-    {#                                             </div>#}
-    {#                                         </div>#}
-    {#                                     </td>#}
-    {#                                     <td>${item.Identity}</td>#}
-    {#                                     <td>${item.Date}</td>#}
-    {#                                     <td class="text-success"><i class="ri-checkbox-circle-line fs-17 align-middle"></i> ${item.Status}</td>`;#}
-    {#                });#}
-    {#            }#}
-    {##}
-    {#            // 当收到后端的数据更新时，调用updateTable函数#}
-    {#            socket.on('update_data', function (data) {#}
-    {#                updateTable(data);#}
-    {#            });#}
-    {#        });#}
-    {#    </script>#}
     <script>
         document.addEventListener('DOMContentLoaded', (event) => {
             var socket = io.connect(window.location.origin);
+            socket.on('connect', function () {
+                console.log('Connected to the server');
+
+            });
+
+//   socket.on('connect_error', function (error) {
+//       console.log('Connect Error:', error);
+////   });
+
+//   socket.on('connect_timeout', function () {
+//       console.log('Connection Timeout');
+//   });
 
             function updateFields(data) {
                 // 更新"total"字段
@@ -317,28 +230,32 @@
                 var tbody = document.querySelector(".table-responsive tbody");
 
                 // 删除旧的项目
-                var deletedRow = document.getElementById(updateInfo.deleted.ID);
-                if (deletedRow) {
-                    deletedRow.remove();
+                for (var deletedItem of updateInfo.deleted) {
+                    var deletedRow = document.getElementById(deletedItem.ID);
+                    if (deletedRow) {
+                        deletedRow.remove();
+                    }
                 }
 
                 // 添加新的项目
-                var row = tbody.insertRow();
-                row.id = updateInfo.added.ID;
-                row.innerHTML = `<td><a class="fw-semibold">${updateInfo.added.ID}</a></td>
-                     <td>
-                         <div class="d-flex gap-2 align-items-center">
-                             <div class="flex-shrink-0">
-                                 <img src="/static/images/users/avatar-3.jpg" alt="" class="avatar-xs rounded-circle" />
-                             </div>
-                             <div class="flex-grow-1">
-                                 ${updateInfo.added.Name}
-                             </div>
-                         </div>
-                     </td>
-                     <td>${updateInfo.added.Identity}</td>
-                     <td>${updateInfo.added.Date}</td>
-                     <td class="text-success"><i class="ri-checkbox-circle-line fs-17 align-middle"></i> ${updateInfo.added.Status}</td>`;
+                for (var addedItem of updateInfo.added) {
+                    var row = tbody.insertRow();
+                    row.id = addedItem.ID;
+                    row.innerHTML = `<td><a class="fw-semibold">${addedItem.ID}</a></td>
+                        <td>
+                            <div class="d-flex gap-2 align-items-center">
+                                <div class="flex-shrink-0">
+                                    <img src="/static/images/users/avatar-3.jpg" alt="" class="avatar-xs rounded-circle" />
+                                </div>
+                                <div class="flex-grow-1">
+                                    ${addedItem.Name}
+                                </div>
+                            </div>
+                        </td>
+                        <td>${addedItem.Identity}</td>
+                        <td>${addedItem.Date}</td>
+                        <td class="text-success"><i class="ri-checkbox-circle-line fs-17 align-middle"></i> ${addedItem.Status}</td>`;
+                }
             }
 
             function updateChart(data) {
@@ -361,28 +278,25 @@
                 });
             }
 
-            socket.on('connect', function () {
-                console.log('Connected to the server');
-            });
+            // 通知服务器客户端已准备好接收数据
+            socket.emit('client_ready');
+            socket.on('video_frame', function (data) {
+                console.log("Received video_frame event");
 
-            socket.on('connect_error', function (error) {
-                console.log('Connect Error:', error);
+                var image = document.getElementById('videoFeed');
+                image.src = "data:image/jpeg;base64," + data;
             });
-
-            socket.on('connect_timeout', function () {
-                console.log('Connection Timeout');
-            });
-
             socket.on('update_table', function (data) {
+                console.log('update_table event received');
                 updateTable(data);
             });
-            socket.on('update_field', function (data) {
-                updateFields(data);
-            });
-            socket.on('update_chart', function (data) {
-                updateChart(data);
-            });
-        });
 
+//    socket.on('update_field', function (data) {
+//        updateFields(data);
+//    });
+//     socket.on('update_chart', function (data) {
+//         updateChart(data);
+//     });
+        });
     </script>
 {% endblock extra_js %}

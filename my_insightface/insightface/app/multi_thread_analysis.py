@@ -1,3 +1,4 @@
+import collections
 import queue
 from threading import Event
 from time import sleep
@@ -17,7 +18,7 @@ from .screen import Screen
 COST_TIME = {}
 threads_done = Event()
 streaming_event = Event()
-image2web_queue = queue.Queue(maxsize=400)
+image2web_deque = collections.deque(maxlen=10)
 __all__ = ["MultiThreadFaceAnalysis", "COST_TIME", "threads_done", "streaming_event"]
 
 
@@ -97,7 +98,7 @@ class MultiThreadFaceAnalysis:
     def image2web(self, jobs: queue.Queue):
         print("image2web start")
         self.show_times = 0
-        image2web_redis = redis.Redis(host='localhost', port=6379)
+        # image2web_redis = redis.Redis(host='localhost', port=6379)
         while not threads_done.is_set():
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 threads_done.set()
@@ -109,8 +110,10 @@ class MultiThreadFaceAnalysis:
                 if streaming_event.is_set():
                     _, buffer = cv2.imencode('.jpg', to_web)
                     frame = buffer.tobytes()
+                    image2web_deque.append(frame)
                     # 传入的是字节流
-                    image2web_redis.lpush("frames", frame)
+                    # image2web_redis.lpush("frames", frame)
+                    # image2web_redis.ltrim("frames", -1, -1)
                 else:
                     cv2.imshow("screen", to_web)
                 self.show_times += 1
