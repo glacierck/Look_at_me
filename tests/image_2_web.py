@@ -7,6 +7,7 @@ from threading import Thread
 from queue import Queue
 from time import sleep
 
+import eventlet
 import redis
 from flask_socketio import SocketIO
 from line_profiler_pycharm import profile
@@ -22,7 +23,8 @@ video_2_detect_queue = Queue(maxsize=400)
 detect_2_rec_queue = Queue(maxsize=200)
 rec_2_screen_queue = Queue(maxsize=400)
 flask_app = create_app()
-socketio = SocketIO(flask_app)
+# eventlet.monkey_patch()  # 可选，对标准库进行补丁，改善并发性能
+socketio = SocketIO(flask_app, async_mode='gevent')
 data = []
 @profile
 def update_data():
@@ -39,7 +41,7 @@ def update_data():
         end = timeit.default_timer()
         # new_data = [{"ID": random.randint(0, 100), "Name": f"New {random.randint(0, 100)}"} for i in range(10)]
         # frequency control
-        max_time = 0.01
+        max_time = 0.0001
         sleep_time = max_time - (end - start) if (end - start) < max_time else 0
         socketio.sleep(sleep_time)
         new_items = []
@@ -77,7 +79,7 @@ def update_image():
             print(datetime.now().strftime("%d %b, %H:%M:%S"), "got frame_bytes" )
             frame_base64 = base64.b64encode(frame_bytes).decode("utf-8")
             socketio.emit('video_frame', frame_base64)
-        socketio.sleep(0.01)
+        socketio.sleep(0.0001)
         cnt += 1
         print("cnt = ", cnt)
         if cnt == 1000:
@@ -163,10 +165,11 @@ def whole_fps_test(
 
     print("camera_fps_test done")
     return "", test.camera.params["resolution"]
+def task_done_callback(future):
+    print(f"\nTask completed. Result: {future.result()}")
 
-
+@profile
 def main():
-
     camera_params = {
         "app": "ip_webcam",
         "approach": "usb",
@@ -182,30 +185,39 @@ def main():
         )
         try:
             # 提交任务到线程池
-            executor.submit(test.video_read, video_2_detect_queue)
-            executor.submit(test.image2detect, video_2_detect_queue, detect_2_rec_queue)
-            executor.submit(test.detect2identify, detect_2_rec_queue, rec_2_screen_queue)
-            executor.submit(test.image2web, rec_2_screen_queue)
-            executor.submit(socketio.run, flask_app, debug=False, port=8088)
+            future1 = executor.submit(test.video_read, video_2_detect_queue)
+            future2 = executor.submit(test.image2detect, video_2_detect_queue, detect_2_rec_queue)
+            future3 = executor.submit(test.detect2identify, detect_2_rec_queue, rec_2_screen_queue)
+            future4 = executor.submit(test.image2web, rec_2_screen_queue)
+            future5 = executor.submit(socketio.run, flask_app, debug=False, port=8088, use_reloader=False)
+
+            # 为每个任务添加回调
+            future1.add_done_callback(task_done_callback)
+            future2.add_done_callback(task_done_callback)
+            future3.add_done_callback(task_done_callback)
+            future4.add_done_callback(task_done_callback)
+            future5.add_done_callback(task_done_callback)
             # 运行 Flask 服务器
             # socketio.run(flask_app, debug=False, port=8088)
 
             # 等待所有任务完成
-            sleep(30)
-            print("sleep 180s")
-            print("all thread tasks done")
-        except KeyboardInterrupt:
-            print("KeyboardInterrupt")
-
-        finally:
+            sleep(45)
+            print("sleep 45s")
             threads_done.set()
+            print("threads_done.set()")
             streaming_event.clear()
+            print("streaming_event.clear()")
             test.test_stop()
-            os._exit(0)
             socketio.stop()
-            executor.shutdown()
-        print("camera_fps_test done")
-    return "", test.camera.params["resolution"]
+            print("socketio.stop()")
+        except SystemExit as e:
+            print("exception:", e)
+        finally:
+            print("all  done")
+            # executor.shutdown(wait=True)  # 这里会阻塞，直到所有线程都完成
+            # print("Executor shutdown complete.")  # 所有线程完成后才会打印此行
+            # os.system(f"pkill -9 -f 'python {__file__}'")
+            # print("os.system(f\"pkill -9 -f 'python {__file__}'\")")
 
 if __name__ == "__main__":
     main()

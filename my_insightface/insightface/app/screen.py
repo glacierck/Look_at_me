@@ -1,10 +1,8 @@
-import queue
 from collections import deque
 from timeit import default_timer as current_time
 import cv2
 import numpy as np
 from numpy import ndarray
-
 from ..data import LightImage
 
 
@@ -30,7 +28,7 @@ class Screen:
         return res
 
     @staticmethod
-    def resize_image(image2resize: ndarray, target_size=(1080, 560)) -> ndarray:
+    def resize_image(image2resize: ndarray, target_size: tuple[int,int] =(1080, 560)) -> ndarray:
         """
         cv2.INTER_AREA：区域插值 效果最好，但速度慢
         cv2.INTER_CUBIC ：三次样条插值，效率居中
@@ -137,7 +135,7 @@ class Screen:
         """
         取最近200次的时间间隔，计算平均fps，从而稳定FPS显示
         Args:
-            image2draw_on: image to draw FPS
+            image2show_nd_arr: image to draw FPS
         Returns: None
         """
         if self._pre == 0:

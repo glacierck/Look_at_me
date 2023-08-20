@@ -64,6 +64,7 @@ class MultiThreadFaceAnalysis:
     def video_read(self, jobs: queue.Queue):
         print("video_read start")
         self.camera.read_video(jobs)
+        return "video_read done"
 
     @profile
     def image2detect(self, jobs: queue.Queue, results: queue.Queue):
@@ -78,6 +79,7 @@ class MultiThreadFaceAnalysis:
                 break
             image_2_show = self._detect(detect_job)
             results.put(image_2_show)
+        return "image2detect done"
 
     @profile
     def detect2identify(self, jobs: queue.Queue, results: queue.Queue):
@@ -93,7 +95,7 @@ class MultiThreadFaceAnalysis:
             except queue.Empty:
                 print("detect2identify is empty")
                 break
-
+        return "detect2identify done"
     @profile
     def image2web(self, jobs: queue.Queue):
         print("image2web start")
@@ -120,7 +122,7 @@ class MultiThreadFaceAnalysis:
             except queue.Empty:
                 print("detect2identify is empty")
                 break
-
+        return "image2web done"
     @profile
     def image_show(self, jobs: queue.Queue):
         # from new_detector_fps import draw_bbox
