@@ -6,6 +6,7 @@ from timeit import default_timer as current_time
 
 import cv2
 from line_profiler_pycharm import profile
+from turbojpeg import TurboJPEG
 
 from .camera import Camera
 from .detector import Detector
@@ -99,15 +100,15 @@ class MultiThreadFaceAnalysis:
     def image2web(self, jobs: queue.Queue):
         print("image2web start")
         self.show_times = 0
+        jpeg = TurboJPEG()
         while not threads_done.is_set():
             try:
                 to_update = jobs.get(timeout=10)
                 to_web = self._screen.show(to_update)
                 # 没有请求之前不 捕获图像
                 if streaming_event.is_set():
-                    _, buffer = cv2.imencode('.jpg', to_web)
-                    frame = buffer.tobytes()
-                    image2web_deque.append(frame)
+                    jpeg_bytes = jpeg.encode(to_web)
+                    image2web_deque.append(jpeg_bytes)
                 else:
                     cv2.imshow("screen", to_web)
                 self.show_times += 1

@@ -26,7 +26,7 @@ data = []
 def update_data():
     print("socketio.start_background_task: update_data start")
     global socketio, data
-    max_time = 0.0015
+    max_time = 0.01
     while streaming_event.is_set():
         socketio.sleep(max_time)
         try:
@@ -60,7 +60,7 @@ def update_data():
 @profile
 def update_image():
     print("socketio.start_background_task: update_image start")
-    max_time = 0.001
+    max_time = 0.006
     while streaming_event.is_set():
         # frame_tuple = image2web_redis.brpop("frames", timeout=1)
         socketio.sleep(max_time)

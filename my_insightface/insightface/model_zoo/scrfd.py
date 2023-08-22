@@ -12,7 +12,6 @@ import os.path as osp
 
 import cv2
 import numpy as np
-from line_profiler_pycharm import profile
 
 
 def softmax(z):
@@ -150,7 +149,6 @@ class SCRFD:
             else:
                 self.input_size = input_size
 
-    @profile
     def forward(self, img, threshold):
         scores_list = []
         bboxes_list = []
@@ -223,7 +221,6 @@ class SCRFD:
                 kpss_list.append(pos_kpss)
         return scores_list, bboxes_list, kpss_list
 
-    @profile
     def detect(self, img, input_size=None, max_num=0, metric='default'):
         assert input_size is not None or self.input_size is not None
         input_size = self.input_size if input_size is None else input_size
