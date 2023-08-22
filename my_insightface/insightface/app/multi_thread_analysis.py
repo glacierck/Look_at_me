@@ -1,13 +1,10 @@
 import collections
+import functools
 import queue
 from threading import Event
-from time import sleep
+from timeit import default_timer as current_time
 
 import cv2
-from timeit import default_timer as current_time
-import functools
-
-import redis
 from line_profiler_pycharm import profile
 
 from .camera import Camera
@@ -18,7 +15,7 @@ from .screen import Screen
 COST_TIME = {}
 threads_done = Event()
 streaming_event = Event()
-image2web_deque = collections.deque(maxlen=10)
+image2web_deque = collections.deque(maxlen=3)
 __all__ = ["MultiThreadFaceAnalysis", "COST_TIME", "threads_done", "streaming_event"]
 
 
@@ -77,8 +74,9 @@ class MultiThreadFaceAnalysis:
             except queue.Empty:
                 print("detect_thread,queue.Empty")
                 break
-            image_2_show = self._detect(detect_job)
-            results.put(image_2_show)
+            else:
+                image_2_show = self._detect(detect_job)
+                results.put(image_2_show)
         return "image2detect done"
 
     @profile
@@ -96,15 +94,12 @@ class MultiThreadFaceAnalysis:
                 print("detect2identify is empty")
                 break
         return "detect2identify done"
+
     @profile
     def image2web(self, jobs: queue.Queue):
         print("image2web start")
         self.show_times = 0
-        # image2web_redis = redis.Redis(host='localhost', port=6379)
         while not threads_done.is_set():
-            if cv2.waitKey(1) & 0xFF == ord("q"):
-                threads_done.set()
-                break
             try:
                 to_update = jobs.get(timeout=10)
                 to_web = self._screen.show(to_update)
@@ -113,9 +108,6 @@ class MultiThreadFaceAnalysis:
                     _, buffer = cv2.imencode('.jpg', to_web)
                     frame = buffer.tobytes()
                     image2web_deque.append(frame)
-                    # 传入的是字节流
-                    # image2web_redis.lpush("frames", frame)
-                    # image2web_redis.ltrim("frames", -1, -1)
                 else:
                     cv2.imshow("screen", to_web)
                 self.show_times += 1
@@ -123,6 +115,7 @@ class MultiThreadFaceAnalysis:
                 print("detect2identify is empty")
                 break
         return "image2web done"
+
     @profile
     def image_show(self, jobs: queue.Queue):
         # from new_detector_fps import draw_bbox
@@ -137,10 +130,6 @@ class MultiThreadFaceAnalysis:
             try:
                 # print(f'finally_show_queue.qsize() = {jobs.qsize()}')
                 to_update = jobs.get(timeout=15)
-                # serialized_light_image = redis_queue.rpop("video_2_show")
-                # if serialized_light_image:
-                #     light_image = pickle.loads(serialized_light_image)
-
                 image2show_nd_arr = self._screen.show(to_update)
                 cv2.imshow('screen', image2show_nd_arr)
                 # draw_bbox(to_update)

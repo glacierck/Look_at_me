@@ -1,9 +1,13 @@
 from collections import deque
 from timeit import default_timer as current_time
+
 import cv2
-import numpy as np
-from numpy import ndarray
+from line_profiler_pycharm import profile
+from numpy import ndarray, sqrt
+
 from ..data import LightImage
+
+data2web_deque: deque[bytes, dict] = deque(maxlen=3)
 
 
 class Screen:
@@ -18,6 +22,18 @@ class Screen:
         self._pre = 0
         self._cur = 0
 
+    @profile
+    def send2web(self, image2web: LightImage):
+        # 处理图像格式
+        show_image = self.show(image2web)
+        _, buffer = cv2.imencode('.jpg', show_image)
+        frame = buffer.tobytes()
+        # 筛选已被识别
+        # print(type(image2web.faces[0][-1]))
+        rec_infos = [face[-1]._asdict() for face in image2web.faces if face[-1].face_id != -1]
+        data2web_deque.append((frame, rec_infos))
+
+    @profile
     def show(self, image2show: LightImage) -> ndarray:
         self._frame_cnt += 1
         if self._frame_cnt > 10000:
@@ -28,7 +44,8 @@ class Screen:
         return res
 
     @staticmethod
-    def resize_image(image2resize: ndarray, target_size: tuple[int,int] =(1080, 560)) -> ndarray:
+    @profile
+    def resize_image(image2resize: ndarray, target_size: tuple[int, int] = (1080, 560)) -> ndarray:
         """
         cv2.INTER_AREA：区域插值 效果最好，但速度慢
         cv2.INTER_CUBIC ：三次样条插值，效率居中
@@ -40,9 +57,10 @@ class Screen:
         original_size = image2resize.shape[:2]
         ratio = min(target_size[0] / original_size[1], target_size[1] / original_size[0])  # 计算缩放比例
         new_size = (int(original_size[1] * ratio), int(original_size[0] * ratio))  # 等比例缩放
-        resized_image = cv2.resize(image2resize, new_size, interpolation=cv2.INTER_AREA)
+        resized_image = cv2.resize(image2resize, new_size, interpolation=cv2.INTER_CUBIC)
         return resized_image
 
+    @profile
     def _draw_bbox(self, dimg, bbox, bbox_color):
         """
         only draw the bbox beside the corner,and the corner is round
@@ -71,6 +89,7 @@ class Screen:
         draw_line((pt2[0], pt2[1]), (pt2[0] - inner_line_len, pt2[1]))
         draw_line((pt2[0], pt2[1]), (pt2[0], pt2[1] - line_len))
 
+    @profile
     def _draw_text(self, dimg, box, name, color):
         # 文字信息显示
         self.font_scale = 3
@@ -96,6 +115,7 @@ class Screen:
                     thickness=3,
                     lineType=cv2.LINE_AA)
 
+    @profile
     def _draw_cross(self, dimg, bbox, color):
         rotate = True if color == (0, 0, 255) else False
         x1, y1, x2, y2 = bbox
@@ -104,38 +124,31 @@ class Screen:
         center_x, center_y = (x1 + x2) // 2, (y1 + y2) // 2
         self._cross_line_thickness = 4 if color != (0, 0, 255) else 5
         # 计算十字架的长度
-        length = int(min(x2 - x1, y2 - y1) * scale)
-
+        length = min(x2 - x1, y2 - y1) * scale
         if rotate:  # 如果需要旋转
-            # 创建一个旋转矩阵
-            M = cv2.getRotationMatrix2D((float(center_x), float(center_y)), 45, 1)
-            length *= 2.5
-            # 创建旋转前的十字架坐标
-            original_cross = np.array([
-                [center_x - length // 2, center_y],
-                [center_x + length // 2, center_y],
-                [center_x, center_y - length // 2],
-                [center_x, center_y + length // 2]
-            ], dtype=np.float32)
-            # 将旋转矩阵应用到十字架坐标
-            rotated_cross = cv2.transform(original_cross.reshape(-1, 1, 2), M).squeeze().astype(int)
+            dis: int = length * sqrt(2) / 2
+            left = int(center_x - dis)
+            right = int(center_x + dis)
+            top = int(center_y - dis)
+            bottom = int(center_y + dis)
+            cv2.line(dimg, (left, top), (right, bottom), color, self._cross_line_thickness)
+            cv2.line(dimg, (left, bottom), (right, top), color, self._cross_line_thickness)
 
-            # 画出旋转后的十字架
-            cv2.line(dimg, tuple(rotated_cross[0]), tuple(rotated_cross[1]), color, self._cross_line_thickness)
-            cv2.line(dimg, tuple(rotated_cross[2]), tuple(rotated_cross[3]), color, self._cross_line_thickness)
         else:  # 不需要旋转
-            cv2.line(dimg, (center_x - length // 2, center_y), (center_x + length // 2, center_y), color,
-                     self._cross_line_thickness)
-            cv2.line(dimg, (center_x, center_y - length // 2), (center_x, center_y + length // 2), color,
-                     self._cross_line_thickness)
-
+            left = int(center_x - length / 2)
+            right = int(center_x + length / 2)
+            top = int(center_y - length / 2)
+            bottom = int(center_y + length / 2)
+            cv2.line(dimg, (left, center_y), (right, center_y), color, self._cross_line_thickness)
+            cv2.line(dimg, (center_x, top), (center_x, bottom), color, self._cross_line_thickness)
         return dimg
 
-    def _draw_fps(self, image2show_nd_arr: ndarray):
+    @profile
+    def _draw_fps(self, image2draw_fps: ndarray):
         """
         取最近200次的时间间隔，计算平均fps，从而稳定FPS显示
         Args:
-            image2show_nd_arr: image to draw FPS
+            image2draw_fps: image to draw FPS
         Returns: None
         """
         if self._pre == 0:
@@ -154,7 +167,7 @@ class Screen:
             self._interval.append(interval)
             self.ave_fps = 1 / self._temp_sum * self._interval.__len__()
             cv2.putText(
-                image2show_nd_arr,
+                image2draw_fps,
                 f"FPS = {self.ave_fps :.2f}",
                 (10, 30),
                 cv2.FONT_HERSHEY_SIMPLEX,
@@ -162,7 +175,9 @@ class Screen:
                 (0, 255, 0),
                 2,
             )
-        return image2show_nd_arr
+        return image2draw_fps
+
+    @profile
     def _draw_on(self, image2draw_on: LightImage):
         dimg = image2draw_on.nd_arr
 
@@ -188,5 +203,5 @@ class Screen:
             elif bbox_color == (0, 0, 255):
                 self._draw_bbox(dimg, bbox, bbox_color)
             # text show
-            self._draw_text(dimg, bbox, name, text_color)
+            # self._draw_text(dimg, bbox, name, text_color)
         return dimg

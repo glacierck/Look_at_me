@@ -1,19 +1,16 @@
 import collections
 import heapq
-import queue
 from pathlib import Path
 
 import numpy as np
-import redis
 from line_profiler_pycharm import profile
 
 from database.milvus_standalone.common import MatchInfo
 from .common import Face, RawTarget, Target
-
 from .sort_plus import associate_detections_to_trackers
 from ..data import LightImage
 
-matched_and_in_screen_deque = collections.deque(maxlen=10)
+matched_and_in_screen_deque = collections.deque(maxlen=3)
 
 
 class Extractor:
@@ -116,7 +113,6 @@ class Identifier:
         from .multi_thread_analysis import streaming_event
         if streaming_event.is_set():
             matched_and_in_screen_deque.append(new_targets)
-
 
     def _update(self, image2update: LightImage):
         # 更新目标

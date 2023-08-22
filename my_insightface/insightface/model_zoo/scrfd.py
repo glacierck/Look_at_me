@@ -5,14 +5,14 @@
 # @Function      : 
 
 from __future__ import division
+
 import datetime
-import numpy as np
-import onnx
-import onnxruntime
 import os
 import os.path as osp
+
 import cv2
-import sys
+import numpy as np
+from line_profiler_pycharm import profile
 
 
 def softmax(z):
@@ -150,6 +150,7 @@ class SCRFD:
             else:
                 self.input_size = input_size
 
+    @profile
     def forward(self, img, threshold):
         scores_list = []
         bboxes_list = []
@@ -222,6 +223,7 @@ class SCRFD:
                 kpss_list.append(pos_kpss)
         return scores_list, bboxes_list, kpss_list
 
+    @profile
     def detect(self, img, input_size=None, max_num=0, metric='default'):
         assert input_size is not None or self.input_size is not None
         input_size = self.input_size if input_size is None else input_size
@@ -238,7 +240,7 @@ class SCRFD:
         resized_img = cv2.resize(img, (new_width, new_height))
         det_img = np.zeros((input_size[1], input_size[0], 3), dtype=np.uint8)
         det_img[:new_height, :new_width, :] = resized_img
-
+        # 最耗时
         scores_list, bboxes_list, kpss_list = self.forward(det_img, self.det_thresh)
 
         scores = np.vstack(scores_list)
@@ -323,7 +325,6 @@ def scrfd_2p5gkps(**kwargs):
 
 
 if __name__ == '__main__':
-    import glob
 
     detector = SCRFD(model_file='./det.onnx')
     detector.prepare(-1)
