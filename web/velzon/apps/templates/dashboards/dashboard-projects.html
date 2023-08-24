@@ -19,7 +19,7 @@
                             <div class="page-title-right">
                                 <ol class="breadcrumb m-0">
                                     <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboards</a></li>
-                                    <li class="breadcrumb-item active">Projects</li>
+                                    <li class="breadcrumb-item active" id="time_show">:::</li>
                                 </ol>
                             </div>
 
@@ -298,5 +298,15 @@
 //         updateChart(data);
 //     });
         });
+    </script>
+    <script>
+        function updateClock() {
+            var now = new Date();
+            var time = now.getHours() + ':' + now.getMinutes() + ':' + now.getSeconds() + '.' + now.getMilliseconds();
+            document.getElementById('time_show').innerHTML = time;
+            setTimeout(updateClock, 1); // 设置时间间隔为1毫秒
+        }
+
+        window.onload = updateClock; // 当页面加载时开始更新时间
     </script>
 {% endblock extra_js %}

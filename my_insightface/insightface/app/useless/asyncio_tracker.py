@@ -1,16 +1,15 @@
 import asyncio
 import functools
+from asyncio import Queue
 from pathlib import Path
 
 import cv2
+from my_insightface.insightface.app.screen import Drawer
 
-from my_insightface.insightface.app.multi_thread_analysis import (COST_TIME, current_time)
-from my_insightface.insightface.app.screen import Screen
 from my_insightface.insightface.app.camera import Camera
-from my_insightface.insightface.app.identifier import Identifier
 from my_insightface.insightface.app.detector import Detector
-from asyncio import Queue
-
+from my_insightface.insightface.app.identifier import Identifier
+from my_insightface.insightface.app.multi_thread_analysis import (COST_TIME, current_time)
 from my_insightface.insightface.data.image import LightImage
 
 
@@ -27,10 +26,13 @@ def cost_time_recording(func):
 
     return wrapper
 
+
 """
 
 非常卡顿
 """
+
+
 class AsyncioFaceAnalysis:
     def __init__(self, test_folder: str):
         self.show_times = 0
@@ -38,7 +40,7 @@ class AsyncioFaceAnalysis:
         self._video = None
         self._camera = Camera(test_folder)
         self._identifier = Identifier()
-        self._screen = Screen()
+        self._screen = Drawer()
         self._detect = Detector()
         self.threads_done = asyncio.Event()
 

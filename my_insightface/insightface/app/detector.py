@@ -4,9 +4,10 @@ import cv2
 from line_profiler_pycharm import profile
 from numpy import ndarray
 
+from .common import ClosableQueue, camera_2_detect_queue, detect_2_rec_queue
 from ..data import LightImage
 
-__all__ = ['Detector']
+__all__ = ['Detector', 'detect_task']
 
 
 # 性能和精确度太差
@@ -50,3 +51,23 @@ class Detector:
             face = [bbox, kps, det_score, None, None]
             img2detect.faces.append(face)
         return img2detect
+
+
+class DetectorTask:
+    def __init__(self, jobs: ClosableQueue, results: ClosableQueue):
+        self.detector = Detector()
+        self._jobs = jobs
+        self._results = results
+
+    @profile
+    def run(self):
+        for img in self._jobs:
+            # img: light image
+            results = self.detector(img)
+            self._results.put(results)
+        return "DetectorTask Done"
+
+
+detect_task = DetectorTask(
+    jobs=camera_2_detect_queue, results=detect_2_rec_queue
+)

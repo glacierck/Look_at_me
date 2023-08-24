@@ -1,4 +1,5 @@
 import base64
+from collections import deque
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from queue import Queue
@@ -17,6 +18,7 @@ from web.velzon.apps import create_app
 video_2_detect_queue = Queue(maxsize=400)
 detect_2_rec_queue = Queue(maxsize=200)
 rec_2_screen_queue = Queue(maxsize=400)
+data2web_deque: deque[bytes, dict] = deque(maxlen=3)
 flask_app = create_app()
 socketio = SocketIO(flask_app, async_mode='gevent')
 data = []

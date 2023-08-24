@@ -3,8 +3,8 @@ import timeit
 
 import cv2
 import numpy as np
+from my_insightface.insightface.app.screen import Drawer
 
-from my_insightface.insightface.app.screen import Screen
 from my_insightface.insightface.app.camera import Camera
 
 """
@@ -13,7 +13,7 @@ from my_insightface.insightface.app.camera import Camera
 
 
 def frame_diff(limit_frames: int):
-    cap = Camera('mp4', resolution=(2592, 1944), fps=30,test_folder='test_03').videoCapture
+    cap = Camera('mp4', resolution=(2592, 1944), fps=30, test_folder='test_03').videoCapture
     start_time = cv2.getTickCount()
     _, frame1 = cap.read()
     _, frame2 = cap.read()
@@ -39,7 +39,7 @@ def frame_diff(limit_frames: int):
 
         # Combine the two thresholded images
         final = cv2.bitwise_and(thresh1, thresh2)
-        resize = Screen.resize_image(final)
+        resize = Drawer.resize_image(final)
         # Display the result
         cv2.imshow('Motion Detection', resize)
 
@@ -87,7 +87,7 @@ def background_subtractor(limit_frames: int):
             # 获取轮廓的边界矩形，然后在原始图像上绘制该矩形
             (x, y, w, h) = cv2.boundingRect(contour)
             cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
-        resize = Screen.resize_image(frame)
+        resize = Drawer.resize_image(frame)
         cv2.imshow('Frame', resize)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):

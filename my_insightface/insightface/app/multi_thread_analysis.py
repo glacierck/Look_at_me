@@ -10,8 +10,8 @@ from turbojpeg import TurboJPEG
 
 from .camera import Camera
 from .detector import Detector
+from .drawer import Drawer
 from .identifier import Identifier
-from .screen import Screen
 
 COST_TIME = {}
 threads_done = Event()
@@ -57,7 +57,7 @@ class MultiThreadFaceAnalysis:
         self._identifier = Identifier(
             self._detect, test_folder=test_folder, **identifier_params
         )
-        self._screen = Screen()
+        self._screen = Drawer()
 
     def video_read(self, jobs: queue.Queue):
         print("video_read start")

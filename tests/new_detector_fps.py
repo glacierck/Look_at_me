@@ -1,12 +1,12 @@
-from threading import Thread
 from queue import Queue
+from threading import Thread
 
 import cv2
+from my_insightface.insightface.app.screen import Drawer
 
-from performance_test import ave_fps_test
 from my_insightface.insightface.app.multi_thread_analysis import MultiThreadFaceAnalysis, COST_TIME
-from my_insightface.insightface.app.screen import Screen
 from my_insightface.insightface.data import LightImage
+from performance_test import ave_fps_test
 
 video_2_detect_queue = Queue(maxsize=400)
 detect_2_show_queue = Queue(maxsize=200)
@@ -15,9 +15,9 @@ detect_2_show_queue = Queue(maxsize=200)
 def draw_bbox(image2show: LightImage):
     faces = image2show.faces
     for face in faces:
-        bbox = list(map(int,face[0]))
+        bbox = list(map(int, face[0]))
         cv2.rectangle(image2show.nd_arr, (bbox[0], bbox[1]), (bbox[2], bbox[3]), (0, 0, 255), 2)
-    resized_image = Screen.resize_image(image2show.nd_arr)
+    resized_image = Drawer.resize_image(image2show.nd_arr)
     cv2.imshow('test', resized_image)
 
 

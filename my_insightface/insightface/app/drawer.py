@@ -1,16 +1,19 @@
 from collections import deque
+from threading import Event
 from timeit import default_timer as current_time
 
 import cv2
 from line_profiler_pycharm import profile
 from numpy import ndarray, sqrt
+from turbojpeg import TurboJPEG
 
+from .common import ClosableQueue, rec_2_draw_queue
 from ..data import LightImage
 
-data2web_deque: deque[bytes, dict] = deque(maxlen=3)
+image2web_deque: deque[bytes, dict] = deque(maxlen=3)
 
 
-class Screen:
+class Drawer:
     def __init__(self):
         self._interval_time_sum_cnt = 0
         self._frame_cnt = 0
@@ -21,17 +24,6 @@ class Screen:
         self.ave_fps = 0
         self._pre = 0
         self._cur = 0
-
-    @profile
-    def send2web(self, image2web: LightImage):
-        # 处理图像格式
-        show_image = self.show(image2web)
-        _, buffer = cv2.imencode('.jpg', show_image)
-        frame = buffer.tobytes()
-        # 筛选已被识别
-        # print(type(image2web.faces[0][-1]))
-        rec_infos = [face[-1]._asdict() for face in image2web.faces if face[-1].face_id != -1]
-        data2web_deque.append((frame, rec_infos))
 
     @profile
     def show(self, image2show: LightImage) -> ndarray:
@@ -205,3 +197,30 @@ class Screen:
             # text show
             # self._draw_text(dimg, bbox, name, text_color)
         return dimg
+
+
+streaming_event = Event()
+
+
+class DrawTask(Drawer):
+    def __init__(self, jobs: ClosableQueue, results: deque):
+        super().__init__()
+        self._jobs = jobs
+        self._results = results
+        self._jpeg_encoder = TurboJPEG()
+
+    @profile
+    def run(self):
+        for img in self._jobs:
+            to_web = self.show(img)
+            if streaming_event.is_set():
+                jpeg_bytes = self._jpeg_encoder.encode(to_web)
+                self._results.append(jpeg_bytes)
+            else:
+                cv2.imshow("screen", to_web)
+        cv2.destroyAllWindows()
+        return "DrawTask Done"
+
+
+draw2web_task = DrawTask(
+    jobs=rec_2_draw_queue, results=image2web_deque)

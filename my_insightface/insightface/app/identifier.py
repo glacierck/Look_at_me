@@ -6,7 +6,9 @@ import numpy as np
 from line_profiler_pycharm import profile
 
 from database.milvus_standalone.common import MatchInfo
-from .common import Face, RawTarget, Target
+from .common import Face, RawTarget, Target, ClosableQueue, detect_2_rec_queue, rec_2_draw_queue
+from .detector import Detector, detect_task
+from .drawer import streaming_event
 from .sort_plus import associate_detections_to_trackers
 from ..data import LightImage
 
@@ -38,7 +40,7 @@ class Extractor:
 
 
 class Identifier:
-    def __init__(self, detector, flush_threshold: int, max_age=120, min_hits=3, iou_threshold=0.3,
+    def __init__(self, detector: Detector, flush_threshold: int, max_age=120, min_hits=3, iou_threshold=0.3,
                  server_refresh=False, npz_refresh=False, test_folder='test_01', ):
         from database.milvus_standalone.milvus_for_realtime import MilvusRealTime
         """
@@ -64,25 +66,10 @@ class Identifier:
             self._milvus.load2RAM()
         self._frame_cnt = 1
 
-        # # 不用队列，因为队列删除不了指定元素
-        # self._matched_and_in_screen = set()
-
-        # # test insert val
-        # self._test_ids = np.random.choice(range(100000), 1000, replace=False).tolist()
-        # self._test_names = (np.random.choice(range(100000), 1000, replace=False)).tolist()
-        # test_embeddings = np.random.uniform(0.1, 1, (1000, 512))
-        # norms = np.linalg.norm(test_embeddings, axis=1, keepdims=True)
-        # self._test_embeddings = (test_embeddings / norms).tolist()
-
     @profile
     def identified_results(self, image2identify: LightImage) -> LightImage:
         self._update(image2identify)
         self._extract(image2identify)
-        # test 模拟搜索时候插入新的 可以慢速的插入，不影响平均fps
-        # if (self._frame_cnt % 600 == 0 and len(self._test_ids)
-        #         and len(self._test_embeddings) and len(self._test_names)):
-        #     self._milvus.add_new_face(self._test_ids.pop(), self._test_names.pop(),
-        #                               self._test_embeddings.pop())
         self._search()
         image2identify.faces.clear()
         matched_and_in_screen = []
@@ -110,10 +97,11 @@ class Identifier:
         self._milvus.stop_milvus()
 
     def _send2web(self, new_targets: list[dict]):
-        from .multi_thread_analysis import streaming_event
+
         if streaming_event.is_set():
             matched_and_in_screen_deque.append(new_targets)
 
+    @profile
     def _update(self, image2update: LightImage):
         # 更新目标
         detected_tars = [RawTarget(id=-1, bbox=face[0],
@@ -186,3 +174,46 @@ class Identifier:
             return heapq.heappop(self._recycled_ids)
         except IndexError:
             return len(self._targets)
+
+
+class IdentifierTask(Identifier):
+    def __init__(self, jobs: ClosableQueue, results: ClosableQueue, identifier_params: dict):
+        """
+
+        Args:
+            jobs:
+            results:
+            identifier_params: { detector:Detector,
+                                 flush_threshold: int,
+                                 max_age: int = 120,
+                                 min_hits: int = 3,
+                                 iou_threshold: float = 0.3,
+                                 server_refresh: bool = False,
+                                 npz_refresh: bool = False,
+                                 test_folder: str = 'test_01'}
+        """
+        super().__init__(**identifier_params)
+        self.jobs = jobs
+        self.results = results
+
+    @profile
+    def run(self):
+        for img in self.jobs:
+            identified = self.identified_results(img)
+            self.results.put(identified)
+        # self.stop_milvus()
+
+        return "IdentifierTask Done"
+
+
+identifier_params = {
+    "flush_threshold": 1000,
+    "server_refresh": True,
+    "npz_refresh": True,
+    "detector": detect_task.detector,
+    "test_folder": "test_02"
+}
+identifier_task = IdentifierTask(
+    jobs=detect_2_rec_queue, results=rec_2_draw_queue,
+    identifier_params=identifier_params
+)

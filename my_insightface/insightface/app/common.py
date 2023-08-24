@@ -1,13 +1,15 @@
+import queue
+from queue import Queue
 from typing import NamedTuple
 
 import numpy as np
 from numpy.linalg import norm as l2norm
 
 # from easydict import EasyDict
-__all__ = ['Face', 'RawTarget','Target']
+__all__ = ['Face', 'RawTarget', 'Target', 'ClosableQueue']
 
 from database.milvus_standalone.common import MatchInfo
-from my_insightface.insightface.app.sort_plus import KalmanBoxTracker
+from .sort_plus import KalmanBoxTracker
 
 
 class Face(dict):
@@ -181,8 +183,6 @@ class Target:
         red = (0, 0, 255)
         yellow = (50, 205, 255)
         green = (152, 251, 152)
-        lavender = (238, 130, 238)
-        blue = (127, 0, 0)
         if self.if_matched:
             # 有匹配对象
             if self.match_info.score > 0.4:
@@ -196,3 +196,29 @@ class Target:
             bbox_color = yellow
             name_color = yellow
         return bbox_color, name_color
+
+
+class ClosableQueue(Queue):
+    def __init__(self, task_name: str, maxsize: int = 100):
+        super().__init__(maxsize=maxsize)
+        self.task_name = task_name
+
+    def __iter__(self):
+        from .camera import camera_read_done
+        try:
+            while True:
+                # print("task_name:", self.task_name,self.qsize())
+                if camera_read_done.is_set():
+                    raise queue.Empty
+                item = self.get(timeout=5)
+                yield item
+        except queue.Empty:
+            raise StopIteration
+        finally:
+            print(
+                f"{self.task_name} queue wait for 5 sec got none,so close it")
+
+
+camera_2_detect_queue = ClosableQueue("camera_2_detect", maxsize=200)
+detect_2_rec_queue = ClosableQueue("detect_2_rec", maxsize=200)
+rec_2_draw_queue = ClosableQueue("rec_2_draw", maxsize=400)
